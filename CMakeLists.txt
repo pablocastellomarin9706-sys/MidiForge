@@ -109,5 +109,5 @@ target_link_libraries(MidiForge
 )
 
 if (MSVC)
-  target_compile_options(MidiForge PRIVATE /W4 /permissive-)
+  target_compile_options(MidiForge PRIVATE /W4 /permissive- /utf-8)
 endif()

@@ -5,6 +5,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "../PluginProcessor.h"
 #include "LookAndFeel.h"
+#include "Components/HeaderBar.h"
+#include "Components/Sidebar.h"
+#include "Components/TabView.h"
 
 namespace MidiForge {
 
@@ -16,9 +19,9 @@ public:
 
 private:
   MidiForgeAudioProcessor& processor;
-  std::unique_ptr<juce::Component> header;
-  std::unique_ptr<juce::Component> sidebar;
-  std::unique_ptr<juce::Component> tabs;
+  std::unique_ptr<HeaderBar> header;
+  std::unique_ptr<Sidebar> sidebar;
+  std::unique_ptr<TabView> tabsView;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

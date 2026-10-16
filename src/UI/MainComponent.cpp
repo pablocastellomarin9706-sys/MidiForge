@@ -1,27 +1,24 @@
 #include "MainComponent.h"
-#include "Components/HeaderBar.h"
-#include "Components/Sidebar.h"
-#include "Components/TabView.h"
 
 namespace MidiForge {
 
 MainComponent::MainComponent(MidiForgeAudioProcessor& p) : processor(p) {
   header = std::make_unique<HeaderBar>(processor);
   sidebar = std::make_unique<Sidebar>(processor);
-  tabs = std::make_unique<TabView>(processor);
+  tabsView = std::make_unique<TabView>(processor);
+
   addAndMakeVisible(*header);
   addAndMakeVisible(*sidebar);
-  addAndMakeVisible(*tabs);
+  addAndMakeVisible(*tabsView);
 
-  auto* tabView = dynamic_cast<TabView*>(tabs.get());
-  dynamic_cast<HeaderBar*>(header.get())->onIdeaChanged = [tabView] {
-    if(tabView) tabView->refreshAll();
+  header->onIdeaChanged = [this] {
+    if(tabsView) tabsView->refreshAll();
   };
 
-  // Generate initial idea so the UI shows something.
+  // Generate an initial idea so the UI shows something on open.
   processor.getCurrentIdea().seed = 12345;
   processor.generateFull();
-  if(tabView) tabView->refreshAll();
+  tabsView->refreshAll();
 }
 
 void MainComponent::paint(juce::Graphics& g) {
@@ -32,7 +29,7 @@ void MainComponent::resized() {
   auto r = getLocalBounds();
   header->setBounds(r.removeFromTop(64));
   sidebar->setBounds(r.removeFromLeft(200));
-  tabs->setBounds(r);
+  tabsView->setBounds(r);
 }
 
 } // namespace MidiForge

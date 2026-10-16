@@ -29,7 +29,7 @@ void DragHandle::paint(juce::Graphics& g) {
   g.fillRoundedRectangle(dragArea.toFloat().reduced(2.0f), 4.0f);
   g.setColour(Palette::textPrimary);
   g.setFont(12.0f);
-  g.drawText(dragging ? "Drop in FL..." : "Drag MIDI  \u2192  " + trackName, dragArea, juce::Justification::centred);
+  g.drawText(dragging ? "Drop in FL..." : "Drag MIDI  ->  " + trackName, dragArea, juce::Justification::centred);
 }
 
 void DragHandle::mouseDown(const juce::MouseEvent& e) {

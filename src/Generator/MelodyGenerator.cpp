@@ -14,7 +14,7 @@ void MelodyGenerator::generate(SessionIdea& idea, RandomGen& rng) {
 
   int bars = idea.bars;
   double beat = 0.0;
-  int curPitch = 60 + scale[rng.nextInt(0, scale.size()-1)];
+  int curPitch = 60 + scale[rng.nextInt(0, (int)scale.size()-1)];
 
   for(int bar=0; bar<bars; ++bar) {
     for(int step=0; step<4; ++step) {
