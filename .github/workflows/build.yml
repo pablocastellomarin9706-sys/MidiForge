@@ -1,0 +1,35 @@
+name: build-vst3
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Locate artifact
+        id: locate
+        shell: pwsh
+        run: |
+          $vst3 = Get-ChildItem -Path build -Recurse -Directory -Filter "MidiForge.vst3" | Select-Object -First 1
+          if (-not $vst3) { throw "MidiForge.vst3 not found" }
+          echo "path=$($vst3.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: MidiForge-vst3
+          path: ${{ steps.locate.outputs.path }}
+          if-no-files-found: error
