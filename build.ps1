@@ -74,7 +74,9 @@ Write-Host "CMake : $cmake"
 Write-Host "VS    : $vs"
 
 Write-Host "`nConfigurando..." -ForegroundColor Cyan
-& $cmake -B "$root\build" -G "Visual Studio 17 2022" -A x64 -S $root
+# No fijamos el generador: dejamos que CMake use el Visual Studio instalado.
+# Forzamos x64 porque FL Studio 25 es de 64 bits.
+& $cmake -B "$root\build" -A x64 -S $root
 if ($LASTEXITCODE -ne 0) { throw "Fallo en la configuración de CMake." }
 
 Write-Host "`nCompilando ($Config)..." -ForegroundColor Cyan
