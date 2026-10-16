@@ -25,7 +25,9 @@ FetchContent_MakeAvailable(JUCE)
 juce_add_plugin(MidiForge
   COMPANY_NAME "MidiForge"
   PLUGIN_NAME "MidiForge"
-  DESCRIPTION "MIDI Generator inspired by Co-Producer - 100% offline"
+  # NOTE: keep this free of '%' - MSBuild treats it as an escape character and
+  # cl.exe then fails with "error D8038: invalid argument" on JucePlugin_Desc.
+  DESCRIPTION "Offline MIDI idea generator"
   VERSION "${CMAKE_PROJECT_VERSION}"
   BUNDLE_ID "com.midiforge.plugin"
   IS_SYNTH TRUE

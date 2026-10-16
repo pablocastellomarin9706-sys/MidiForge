@@ -35,7 +35,39 @@ jobs:
 
       - name: Build
         shell: pwsh
-        run: cmake --build build --config Release --parallel
+        run: |
+          $ErrorActionPreference = 'Continue'
+          # Tee so the log is visible in the UI *and* captured for annotations.
+          cmake --build build --config Release --parallel 2>&1 | Tee-Object -FilePath build.log
+          $exit = $LASTEXITCODE
+          Write-Host "cmake exit code: $exit"
+          if ($exit -ne 0) { exit $exit }
+
+      # Publish compile errors as annotations. Annotations ARE readable via the
+      # public check-runs API, so failures can be debugged without copy/pasting
+      # logs out of the Actions UI.
+      - name: Report build errors
+        if: failure()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $lines = @(Get-Content build.log -ErrorAction SilentlyContinue)
+          if ($lines.Count -eq 0) {
+            Write-Host "::error::build.log not found - cannot extract compiler errors."
+            exit 0
+          }
+
+          $errs = @($lines | Where-Object { $_ -match 'error [A-Z]+\d+|fatal error|CMake Error' })
+          if ($errs.Count -eq 0) { $errs = @($lines | Select-Object -Last 30) }
+
+          $report = @($errs | Select-Object -First 40 | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+          $escaped = @($report | ForEach-Object { $_ -replace '%', '%25' -replace "`r", '' })
+          Write-Host ("::error::Build failed - first errors:%0A" + ($escaped -join '%0A'))
+
+          $tail = @($lines | Select-Object -Last 25 | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+          $tailEsc = @($tail | ForEach-Object { $_ -replace '%', '%25' -replace "`r", '' })
+          Write-Host ("::notice title=Tail of build log::" + ($tailEsc -join '%0A'))
+          exit 0
 
       - name: Locate artifact
         id: locate

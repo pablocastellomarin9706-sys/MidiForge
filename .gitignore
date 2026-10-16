@@ -1,6 +1,7 @@
 # Build output
 /build/
 /out/
+*.log
 /cmake-build-*/
 
 # Visual Studio
