@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 0.1.0
+  VERSION 0.3.0
   LANGUAGES CXX
 )
 
@@ -53,6 +53,8 @@ target_sources(MidiForge
     src/Core/MusicTheory.cpp
     src/Core/MusicTheory.h
     src/Core/RandomGen.h
+    src/Chat/ChatEngine.cpp
+    src/Chat/ChatEngine.h
     src/Content/Progressions.cpp
     src/Content/Progressions.h
     src/Content/Patterns.cpp
@@ -91,6 +93,8 @@ target_sources(MidiForge
     src/UI/Components/DrumGrid.h
     src/UI/Components/DragHandle.cpp
     src/UI/Components/DragHandle.h
+    src/UI/Components/ChatPanel.cpp
+    src/UI/Components/ChatPanel.h
 )
 
 target_compile_definitions(MidiForge

@@ -13,6 +13,20 @@ static int64_t baseSeedOf(const SessionIdea& idea) {
   return (int64_t)idea.seed * 1000003 + (int64_t)idea.take * 7919 + 7;
 }
 
+// Keeps mute/solo state alive across regenerations (chat + Replace buttons).
+static bool flagOf(const std::vector<TrackIdea>& tracks, const juce::String& name,
+                   bool TrackIdea::*member) {
+  for (const auto& t : tracks) if (t.name == name) return t.*member;
+  return false;
+}
+
+static void restoreFlags(std::vector<TrackIdea>& tracks, const std::vector<TrackIdea>& oldTracks) {
+  for (auto& t : tracks) {
+    t.mute = flagOf(oldTracks, t.name, &TrackIdea::mute);
+    t.solo = flagOf(oldTracks, t.name, &TrackIdea::solo);
+  }
+}
+
 void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
   ScaleType fam = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural : ScaleType::Major;
 
@@ -54,10 +68,12 @@ void IdeaGenerator::runAll(SessionIdea& idea, RandomGen& rng) {
 }
 
 void IdeaGenerator::generateFull(SessionIdea& idea) {
+  auto oldTracks = idea.tracks;
   idea.tracks.clear();
   RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
   pickAll(idea, rng);
   runAll(idea, rng);
+  restoreFlags(idea.tracks, oldTracks);
 }
 
 void IdeaGenerator::clearTrack(SessionIdea& idea, const juce::String& name) {
@@ -68,6 +84,7 @@ void IdeaGenerator::clearTrack(SessionIdea& idea, const juce::String& name) {
 }
 
 void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& trackName, int seedOffset) {
+  auto oldTracks = idea.tracks;
   clearTrack(idea, trackName);
   int64_t rs = baseSeedOf(idea) + (int64_t)seedOffset * 104729 + trackName.hashCode();
   RandomGen rng((int)(((rs % 2147483647) + 2147483647) % 2147483647));
@@ -100,6 +117,8 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     idea.drumPatternName = Content::allDrumPatterns()[(size_t)idea.drumPatternIdx].name;
     DrumGenerator dg; dg.generate(idea, rng);
   }
+
+  restoreFlags(idea.tracks, oldTracks);
 }
 
 } // namespace MidiForge

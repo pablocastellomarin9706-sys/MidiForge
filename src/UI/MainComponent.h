@@ -8,6 +8,7 @@
 #include "Components/HeaderBar.h"
 #include "Components/Sidebar.h"
 #include "Components/TabView.h"
+#include "Components/ChatPanel.h"
 
 namespace MidiForge {
 
@@ -22,6 +23,8 @@ private:
   std::unique_ptr<HeaderBar> header;
   std::unique_ptr<Sidebar> sidebar;
   std::unique_ptr<TabView> tabsView;
+  std::unique_ptr<ChatPanel> chat;
+  bool chatVisible{true};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

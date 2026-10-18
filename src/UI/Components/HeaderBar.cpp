@@ -30,6 +30,12 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
   shuffleButton.onClick = [reroll] { reroll(false); };
   addAndMakeVisible(shuffleButton);
 
+  chatButton.setClickingTogglesState(true);
+  chatButton.setToggleState(true, juce::dontSendNotification);
+  chatButton.setColour(juce::TextButton::buttonOnColourId, Palette::accent.darker(0.15f));
+  chatButton.onClick = [this] { if (onChatToggle) onChatToggle(); };
+  addAndMakeVisible(chatButton);
+
   auto setupLabel = [this](juce::Label& l, const juce::String& text) {
     l.setText(text, juce::dontSendNotification);
     l.setColour(juce::Label::textColourId, Palette::textSecondary);
@@ -158,6 +164,8 @@ void HeaderBar::resized() {
     rr.removeFromLeft(16);
     seedLabel.setBounds(rr.removeFromLeft(34).removeFromBottom(16));
     seedSlider.setBounds(rr.removeFromLeft(120).withSizeKeepingCentre(120, 24));
+    rr.removeFromLeft(12);
+    chatButton.setBounds(rr.removeFromLeft(64).reduced(0, 4));
   }
   {
     auto rr = row2;
