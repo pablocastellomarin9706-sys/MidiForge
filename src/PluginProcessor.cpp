@@ -40,7 +40,7 @@ void MidiForgeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
   // Sample audition output.
   if (previewing.load()) {
-    if (transport.isPlaying()) {
+    if (transport.isPlaying() && !transport.hasStreamFinished()) {
       juce::AudioSourceChannelInfo info(&buffer, 0, buffer.getNumSamples());
       transport.getNextAudioBlock(info);
     } else {
