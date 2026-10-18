@@ -208,18 +208,16 @@ void HeaderBar::paint(juce::Graphics& g) {
     g.fillPath(spark);
 
     auto textArea = tb.withTrimmedLeft(38);
-    auto fontBold = juce::Font(juce::FontOptions(21.0f, juce::Font::bold));
+    juce::AttributedString as;
+    as.append("Midi", juce::Font(juce::FontOptions(21.0f, juce::Font::bold)), Palette::textPrimary);
+    as.append("Forge", juce::Font(juce::FontOptions(21.0f)), Palette::accent);
+    as.setJustification(juce::Justification::centredLeft);
+
     juce::TextLayout tl;
-    tl.createLayout(fontBold, 200.0f, juce::Justification::centredLeft, "Midi");
-    const int midiW = (int)tl.getWidth();
-
-    g.setFont(fontBold);
-    g.setColour(Palette::textPrimary);
-    g.drawText("Midi", textArea, juce::Justification::centredLeft);
-
-    g.setFont(juce::Font(juce::FontOptions(21.0f, juce::Font::plain)));
-    g.setColour(Palette::accent);
-    g.drawText("Forge", textArea.withTrimmedLeft(midiW + 3), juce::Justification::centredLeft);
+    tl.createLayout(as, (float)textArea.getWidth());
+    const float ty = (float)textArea.getY() + ((float)textArea.getHeight() - tl.getHeight()) * 0.5f;
+    tl.draw(g, juce::Rectangle<float>((float)textArea.getX(), ty,
+                                      (float)textArea.getWidth(), tl.getHeight()));
   }
 }
 
