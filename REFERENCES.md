@@ -34,7 +34,25 @@ Mapeadas a rasgos MIDI concretos (swing, jitter, densidad, extensiones, registro
 | NTG | Bronx, spanglish trap latino | Melodias tristes + flow agresivo |
 | Cero* | canal ES underground | Justifica preset latino para escena local |
 
-## 4. Calibracion pendiente
+## 4. Fuentes de samples (curaduria de canales aportados)
+
+| Fuente | Que minar | Para que caracter |
+| --- | --- | --- |
+| Portal Records Japan (portal-records.com / YT @portalrecordsjapan2021) | New Age, Ambient, City Pop, Boogie de prensa privada japonesa (stock ~2000 vinilos raros) | Bells/pads (Plugg, Rage), intros de balada (jerk haze) |
+| Samplette (ya en el Scout del chat) | busquedas con "used count" bajo | samples de YouTube con pocas reproducciones = criterio del brief |
+| Rio Leyva (@rioleyva2002, kits: Loop Archive 2600+, Analog Magic, 3YOU) | loops y one-shots | ADN autentico Yeat/rage; A/B de calibracion (no son "raros", son el estandar) |
+| mayze (@ytmayze) | streams "unique jerk beats", crank, 2000s swag (perfil xaviersobased) | texturas Nu-Jerk |
+| Insulation Producers | From Scratch Sessions (p.ej. OGX Beats x Jouta, Detroit trap) | workflow y estetica Detroit actual; comunidad ES |
+| PolBeats (@PolBeatss) | guitarras espanolas + bells oscuras, "melodies don't need more notes" | melodia Trap Latino, densidad/aire |
+| Oscar Calmaestra | mezcla/mastering ES, diseno sonoro, low end | dar densidad y pegada a samples propios |
+| ServidaMusic (Simon Servida) | tecnicas de flip ("Every Sample Technique") | convertir hallazgos raros en beats |
+| Lucid Beats (@LucidBeats) | r&b beats & samples hechos en vivo | texturas ethereas para Plugg |
+| Nick Mira (@nms2k) | cookups de melodia (estudio, no kits) | densidad y personalidad melodica; sus kits ya estan saturados |
+
+Regla del brief: priorizar prensa privada, baladas 70s/80s, 45s de soul/gospel y
+new age de cassette con pocas reproducciones frente a fuentes comerciales.
+
+## 5. Calibracion pendiente
 
 - [x] Trap Latino/ES: swing 5%, hats fantasma 45%, 808 glides (bassLenScale 1.7),
       densidad 0.9, menor armonica por defecto (desde Mayor).
