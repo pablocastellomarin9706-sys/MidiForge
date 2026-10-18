@@ -340,6 +340,8 @@ juce::String buildScoutQuery(const juce::String& s, const SessionIdea& idea) {
 
 // ---------------------------------------------------------------- engine
 
+ChatEngine::ChatEngine(MidiForgeAudioProcessor& p) : processor(p) {}
+
 ChatReply ChatEngine::handle(const juce::String& userText) {
   ChatReply reply;
   auto raw = userText.trim();
@@ -354,7 +356,7 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
     auto q = buildScoutQuery(s, idea);
     reply.searchQuery = q;
     reply.text = "He preparado la búsqueda: '" + q + "'\n"
-                 "Pulsa 'Abrir búsqueda' y elige tienda (Splice, Freesound, Loopcloud o Samplette).\n"
+                 "Pulsa 'Abrir búsqueda' y elige fuente (Splice, Freesound, Loopcloud, Samplette, YouTube o SoundCloud).\n"
                  "Nota Samplette: es un shuffle con filtros; usa Key = " + keyLabelOf(idea) +
                  " y estilo " + styleName(idea.style) + ".";
     return reply;
@@ -493,6 +495,10 @@ juce::String ChatEngine::buildSearchUrl(const juce::String& query, int provider)
   if (provider == 1) return "https://splice.com/sounds/search?q=" + escaped;
   if (provider == 2) return "https://freesound.org/search/?q=" + escaped;
   if (provider == 4) return "https://sounds.loopcloud.com/search?q=" + escaped;
+  if (provider == 5)
+    return "https://www.youtube.com/results?search_query=" +
+           juce::URL::addEscapeChars(query.trim() + " type beat", true);
+  if (provider == 6) return "https://soundcloud.com/search?q=" + escaped;
   return "https://samplette.io/";
 }
 

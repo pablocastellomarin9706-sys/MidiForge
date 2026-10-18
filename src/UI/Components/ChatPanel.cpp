@@ -42,6 +42,8 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
   providerBox.addItem("Freesound", 2);
   providerBox.addItem("Loopcloud", 4);
   providerBox.addItem("Samplette", 3);
+  providerBox.addItem("YouTube (referencias)", 5);
+  providerBox.addItem("SoundCloud (referencias)", 6);
   providerBox.setSelectedId(1, juce::dontSendNotification);
   addAndMakeVisible(providerBox);
 

@@ -21,7 +21,8 @@ public:
 
   ChatReply handle(const juce::String& userText);
 
-  // Builds a sample search URL. provider: 1=Splice, 2=Freesound, 3=Samplette, 4=Loopcloud.
+  // Builds a sample search URL. provider: 1=Splice, 2=Freesound, 3=Samplette,
+  // 4=Loopcloud, 5=YouTube (references), 6=SoundCloud (references).
   static juce::String buildSearchUrl(const juce::String& query, int provider);
 
 private:
