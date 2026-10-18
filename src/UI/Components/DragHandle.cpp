@@ -22,7 +22,7 @@ void DragHandle::paint(juce::Graphics& g) {
   g.fillRoundedRectangle(regenArea.toFloat().reduced(2.0f), 4.0f);
   g.setColour(Palette::textPrimary);
   g.setFont(12.0f);
-  g.drawText("Regenerate", regenArea, juce::Justification::centred);
+  g.drawText("Replace", regenArea, juce::Justification::centred);
 
   auto dragArea = getLocalBounds().withTrimmedLeft(108);
   g.setColour(dragging ? Palette::accent : Palette::panelAlt);

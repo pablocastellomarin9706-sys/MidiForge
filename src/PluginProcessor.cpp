@@ -48,8 +48,9 @@ void MidiForgeAudioProcessor::generateFull() {
 }
 
 void MidiForgeAudioProcessor::regenerateTrack(const juce::String& name) {
+  ++regenCounter;
   IdeaGenerator gen;
-  gen.regenerateTrack(currentIdea, name, 1);
+  gen.regenerateTrack(currentIdea, name, regenCounter);
 }
 
 } // namespace MidiForge

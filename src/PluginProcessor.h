@@ -38,6 +38,7 @@ public:
 
 private:
   SessionIdea currentIdea;
+  int regenCounter{0};
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiForgeAudioProcessor)
 };
 

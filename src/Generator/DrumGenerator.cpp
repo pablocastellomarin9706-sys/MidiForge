@@ -1,26 +1,37 @@
 #include "DrumGenerator.h"
+#include "../Content/Patterns.h"
 
 namespace MidiForge {
 
 void DrumGenerator::generate(SessionIdea& idea, RandomGen& rng) {
-  TrackIdea drums;
-  drums.name = "Drums";
-  drums.channel = 10;
-  drums.colour = juce::Colour(255, 124, 92);
+  const auto& pats = Content::allDrumPatterns();
+  if (idea.drumPatternIdx < 0 || idea.drumPatternIdx >= (int)pats.size()) return;
+  const auto& pat = pats[(size_t)idea.drumPatternIdx];
 
-  int bars = idea.bars;
-  double beat = 0.0;
-  for(int bar=0; bar<bars; ++bar) {
-    for(int step=0; step<16; ++step) {
-      double start = beat + step*0.25;
-      if(step%4==0) drums.notes.push_back({36, start, 0.1, 120, 10}); // kick
-      if(step%4==2) drums.notes.push_back({38, start, 0.1, 110, 10}); // snare
-      if(step%8==2 || step%8==6) drums.notes.push_back({42, start, 0.1, 95, 10}); // hat
-      if(rng.nextDouble()>0.8) drums.notes.push_back({46, start, 0.1, 90, 10});
+  TrackIdea t;
+  t.name = "Drums";
+  t.channel = 10;
+  t.colour = juce::Colour(255, 124, 92);
+  t.detail = pat.name;
+
+  int bars = idea.bars > 0 ? idea.bars : 4;
+  for (int bar = 0; bar < bars; ++bar) {
+    double base = (double)bar * 4.0;
+    for (const auto& h : pat.hits) {
+      double start = base + (double)h.step * 0.25;
+      if (idea.swing > 0.0 && (h.step % 2 == 1)) start += (idea.swing / 100.0) * 0.15;
+      int vel = juce::jlimit(1, 127, h.velocity + rng.nextInt(-6, 6));
+      t.notes.push_back({h.pitch, start, 0.12, vel, 10});
     }
-    beat += 4;
+    if (bars > 1 && bar == bars - 1) {
+      // Crash + snare fill into the loop point (skip crash for laid-back styles).
+      if (idea.style != Style::HipHop && idea.style != Style::LoFi)
+        t.notes.push_back({49, base, 0.5, 108, 10});
+      t.notes.push_back({Content::kSnare, base + 3.5, 0.12, 112, 10});
+      t.notes.push_back({Content::kSnare, base + 3.75, 0.12, 118, 10});
+    }
   }
-  idea.tracks.push_back(drums);
+  idea.tracks.push_back(std::move(t));
 }
 
 } // namespace MidiForge

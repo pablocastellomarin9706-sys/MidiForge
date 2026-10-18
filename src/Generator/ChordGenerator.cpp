@@ -1,45 +1,44 @@
 #include "ChordGenerator.h"
 #include "../Core/MusicTheory.h"
-#include <cmath>
+#include "../Content/Progressions.h"
+#include "../Content/Patterns.h"
 
 namespace MidiForge {
 
 void ChordGenerator::generate(SessionIdea& idea, RandomGen& rng) {
-  auto scale = MusicTheory::getScale(idea.scale, idea.keyRoot);
-  if(scale.empty()) return;
+  auto chords = Content::realizeProgression(idea);
+  if (chords.empty()) return;
 
-  TrackIdea chordsTrack;
-  chordsTrack.name = "Chords";
-  chordsTrack.channel = 1;
-  chordsTrack.colour = juce::Colour(124, 92, 255);
+  TrackIdea t;
+  t.name = "Chords";
+  t.channel = 1;
+  t.colour = juce::Colour(124, 92, 255);
+  t.detail = idea.progressionDisplay + "  -  " + idea.progressionName;
 
-  double beat = 0.0;
-  int bars = idea.bars > 0 ? idea.bars : 4;
-  int chordLenBeats = 4; // simple 1 chord per bar
+  auto rhythm = Content::chordRhythmFor(idea.style);
 
-  for(int bar = 0; bar < bars; ++bar) {
-    int rootPc = scale[rng.nextInt(0, (int)scale.size()-1)];
-    int bass = 48 + rootPc; // C3 area approx
-    // triad
-    std::vector<int> chordNotes = {bass, bass+4, bass+7};
-    if(rng.nextDouble() > 0.5) {
-      // alternate voicing
-      chordNotes[1] = bass+3;
-    }
-    double len = chordLenBeats;
-    for(size_t i=0; i<chordNotes.size(); ++i) {
-      double offset = 0.0;
-      if(idea.strum > 0.0) {
-        double step = idea.strum * 0.25;
-        if(idea.strumDir == 0) offset = (double)i * step;
-        else if(idea.strumDir == 1) offset = (double)(chordNotes.size()-1-i) * step;
-        else offset = (rng.nextDouble()) * step;
+  for (const auto& ch : chords) {
+    if (ch.pitches.empty()) continue;
+    t.chordSymbols.push_back(ch.symbol);
+    for (const auto& hit : rhythm) {
+      double start = ch.startBeat + hit.first;
+      double len = hit.second;
+      for (size_t i = 0; i < ch.pitches.size(); ++i) {
+        double so = 0.0;
+        if (idea.strum > 0.0) {
+          double step = idea.strum * 0.25;
+          if (idea.strumDir == 0) so = (double)i * step;
+          else if (idea.strumDir == 1) so = (double)(ch.pitches.size() - 1 - i) * step;
+          else so = rng.nextDouble() * step;
+        }
+        int vel = 88 + (int)(idea.brightness * 12.0) + rng.nextInt(-8, 8);
+        if (hit.first == 0.0) vel += 4;
+        vel = juce::jlimit(1, 127, vel);
+        t.notes.push_back({ch.pitches[i], start + so, len, vel, 1});
       }
-      chordsTrack.notes.push_back({chordNotes[i], beat + offset, len - offset > 0.5 ? 0.5 : len, 90 + rng.nextInt(-10,10), 1});
     }
-    beat += chordLenBeats;
   }
-  idea.tracks.push_back(chordsTrack);
+  idea.tracks.push_back(std::move(t));
 }
 
 } // namespace MidiForge

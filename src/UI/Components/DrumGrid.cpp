@@ -47,6 +47,8 @@ void DrumGrid::paint(juce::Graphics& g) {
   for(const auto& n : track->notes) {
     int row = -1;
     for(int i=0;i<4;++i) if(drumNotes[i]==n.pitch) row = i;
+    if(n.pitch == 39) row = 1;      // clap -> snare row
+    else if(n.pitch == 49) row = 3; // crash -> perc row
     if(row < 0) continue;
     int step = (int)std::round(n.start * 4.0);
     if(step < 0 || step >= steps) continue;

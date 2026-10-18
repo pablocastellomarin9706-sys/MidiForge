@@ -23,6 +23,7 @@ public:
 private:
   MidiForgeAudioProcessor& processor;
   juce::String trackName;
+  juce::String detailText;
   int kind; // 0 chords, 1 melody/bass piano roll, 2 drums
   ChordStrip chordStrip;
   PianoRollMini pianoRoll;

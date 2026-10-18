@@ -36,7 +36,10 @@ void ChordStrip::paint(juce::Graphics& g) {
     g.fillRoundedRectangle((float)x, 34.0f, (float)w - 8.0f, (float)(getHeight()-46), 5.0f);
     g.setColour(juce::Colours::white);
     g.setFont(12.0f);
-    g.drawText("Chord " + juce::String(count+1), (int)x, 34, (int)w-8, getHeight()-46, juce::Justification::centred);
+    juce::String sym = ((size_t)count < track->chordSymbols.size())
+                           ? track->chordSymbols[(size_t)count]
+                           : ("Chord " + juce::String(count + 1));
+    g.drawText(sym, (int)x, 34, (int)w - 8, getHeight() - 46, juce::Justification::centred);
     ++count;
   }
 }

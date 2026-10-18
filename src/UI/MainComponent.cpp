@@ -27,7 +27,7 @@ void MainComponent::paint(juce::Graphics& g) {
 
 void MainComponent::resized() {
   auto r = getLocalBounds();
-  header->setBounds(r.removeFromTop(64));
+  header->setBounds(r.removeFromTop(96));
   sidebar->setBounds(r.removeFromLeft(200));
   tabsView->setBounds(r);
 }

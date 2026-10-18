@@ -18,9 +18,9 @@ private:
   juce::TextButton generateButton{"GENERATE"};
   juce::TextButton shuffleButton{"Shuffle"};
   juce::Label titleLabel;
-  juce::ComboBox keyBox, scaleBox;
-  juce::Slider barsSlider, seedSlider, swingSlider;
-  juce::Label keyLabel, scaleLabel, barsLabel, seedLabel, swingLabel;
+  juce::ComboBox keyBox, scaleBox, styleBox;
+  juce::Slider barsSlider, seedSlider, swingSlider, brightnessSlider;
+  juce::Label keyLabel, scaleLabel, styleLabel, barsLabel, seedLabel, swingLabel, brightLabel;
 
   void refreshFromIdea();
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderBar)

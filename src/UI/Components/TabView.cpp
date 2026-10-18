@@ -28,14 +28,20 @@ void TrackPage::refresh() {
   chordStrip.setTrack(t);
   pianoRoll.setTrack(t);
   drumGrid.setTrack(t);
+  detailText = (t != nullptr && t->detail.isNotEmpty()) ? t->detail : juce::String();
+  repaint();
 }
 
 void TrackPage::paint(juce::Graphics& g) {
   g.fillAll(Palette::panel);
-  g.setColour(Palette::textSecondary);
+  auto r = getLocalBounds().reduced(12).removeFromTop(18);
   g.setFont(juce::Font(juce::FontOptions(12.0f)));
-  g.drawText("Track: " + trackName, getLocalBounds().reduced(12).removeFromTop(18),
-             juce::Justification::topLeft);
+  g.setColour(Palette::textSecondary);
+  g.drawText(trackName, r.removeFromLeft(90), juce::Justification::centredLeft);
+  if (detailText.isNotEmpty()) {
+    g.setColour(Palette::accentDim);
+    g.drawText(detailText, r, juce::Justification::centredLeft);
+  }
 }
 
 void TrackPage::resized() {

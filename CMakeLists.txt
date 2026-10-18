@@ -53,6 +53,10 @@ target_sources(MidiForge
     src/Core/MusicTheory.cpp
     src/Core/MusicTheory.h
     src/Core/RandomGen.h
+    src/Content/Progressions.cpp
+    src/Content/Progressions.h
+    src/Content/Patterns.cpp
+    src/Content/Patterns.h
     src/Generator/ChordGenerator.cpp
     src/Generator/ChordGenerator.h
     src/Generator/MelodyGenerator.cpp
