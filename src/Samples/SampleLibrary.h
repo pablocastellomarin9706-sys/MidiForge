@@ -33,6 +33,12 @@ public:
   int numItems() const;
   std::vector<SampleItem> snapshot() const;
 
+  // Favourites (message thread only; persisted with the plugin state).
+  juce::StringArray getFavorites() const;
+  void setFavorites(const juce::StringArray& newFavorites);
+  bool isFavorite(const juce::String& path) const;
+  bool toggleFavorite(const juce::String& path);
+
   // Called on the message thread whenever a scan makes progress / finishes.
   std::function<void()> onScanChanged;
 
@@ -49,6 +55,8 @@ private:
   mutable juce::CriticalSection lock;
   std::vector<SampleItem> items;
   juce::StringArray folders;
+  mutable juce::CriticalSection favLock;
+  juce::StringArray favorites;
   std::atomic<bool> scanning{false};
   std::atomic<bool> dirty{false};
   std::shared_ptr<std::atomic<bool>> aliveFlag;

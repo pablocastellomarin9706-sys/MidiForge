@@ -194,4 +194,37 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
   restoreFlags(idea.tracks, oldTracks);
 }
 
+void IdeaGenerator::applyCreativityToTrack(TrackIdea& track, float amount, juce::Random& rng) {
+  const float a = juce::jlimit(0.0f, 1.0f, amount);
+  if (a <= 0.001f) return;
+
+  const bool melodic = track.name.containsIgnoreCase("melod");
+  const bool drums = track.name.containsIgnoreCase("drum");
+
+  for (auto& n : track.notes) {
+    // Velocity humanisation.
+    const int vd = juce::roundToInt((rng.nextFloat() * 2.0f - 1.0f) * a * 20.0f);
+    n.velocity = juce::jlimit(1, 127, n.velocity + vd);
+
+    // Micro timing drift (kept out of the drum lane to protect the groove).
+    if (!drums) {
+      const double jitter = (double)(rng.nextFloat() * 2.0f - 1.0f) * (double)a * 0.03;
+      n.start = juce::jmax(0.0, n.start + jitter);
+    }
+
+    // Occasional octave sparkle on the melody.
+    if (melodic && rng.nextFloat() < a * 0.15f) {
+      const int p = n.pitch + (rng.nextBool() ? 12 : -12);
+      if (p >= 24 && p <= 108) n.pitch = p;
+    }
+  }
+}
+
+void IdeaGenerator::applyCreativity(SessionIdea& idea, float amount, int seedSalt) {
+  if (amount <= 0.001f) return;
+  juce::Random rng(idea.seed * 7919 + seedSalt * 104729 + idea.take * 31 + 17);
+  for (auto& t : idea.tracks)
+    applyCreativityToTrack(t, amount, rng);
+}
+
 } // namespace MidiForge

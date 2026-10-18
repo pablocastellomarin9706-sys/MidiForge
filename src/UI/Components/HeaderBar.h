@@ -24,8 +24,9 @@ private:
   juce::TextButton chatButton{"Chat"};
   juce::Label titleLabel;
   juce::ComboBox keyBox, scaleBox, styleBox;
-  juce::Slider barsSlider, seedSlider, swingSlider, brightnessSlider;
-  juce::Label keyLabel, scaleLabel, styleLabel, barsLabel, seedLabel, swingLabel, brightLabel;
+  juce::Slider barsSlider, seedSlider, swingSlider, brightnessSlider, variationSlider;
+  juce::Label keyLabel, scaleLabel, styleLabel, barsLabel, seedLabel, swingLabel, brightLabel,
+      variationLabel;
 
   double sheenPhase{0.0};
 

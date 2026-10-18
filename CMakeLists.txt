@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 0.4.0
+  VERSION 0.5.0
   LANGUAGES CXX
 )
 
@@ -112,6 +112,7 @@ target_compile_definitions(MidiForge
 target_link_libraries(MidiForge
   PRIVATE
     juce::juce_audio_processors
+    juce::juce_audio_formats
     juce::juce_gui_extra
     juce::juce_gui_basics
     juce::juce_graphics

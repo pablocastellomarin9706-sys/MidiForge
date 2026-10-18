@@ -51,6 +51,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
   setupLabel(seedLabel, "Seed");
   setupLabel(swingLabel, "Swing");
   setupLabel(brightLabel, "Juice");
+  setupLabel(variationLabel, "Var");
 
   for (int i = 0; i < 12; ++i) keyBox.addItem(keyNames[i], i + 1);
   keyBox.onChange = [this] {
@@ -123,6 +124,17 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
   };
   addAndMakeVisible(brightnessSlider);
 
+  variationSlider.setRange(0, 100, 1);
+  variationSlider.setValue(0, juce::dontSendNotification);
+  variationSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+  variationSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+  variationSlider.onValueChange = [this] {
+    processor.getCurrentIdea().creativity = (float)(variationSlider.getValue() / 100.0);
+    processor.generateFull();
+    refreshFromIdea();
+  };
+  addAndMakeVisible(variationSlider);
+
   refreshFromIdea();
 }
 
@@ -142,6 +154,7 @@ void HeaderBar::refreshFromIdea() {
   seedSlider.setValue(idea.seed, juce::dontSendNotification);
   swingSlider.setValue(idea.swing, juce::dontSendNotification);
   brightnessSlider.setValue(idea.brightness * 100.0, juce::dontSendNotification);
+  variationSlider.setValue(idea.creativity * 100.0, juce::dontSendNotification);
   if (onIdeaChanged) onIdeaChanged();
 }
 
@@ -259,6 +272,7 @@ void HeaderBar::resized() {
     place(barsLabel, barsSlider, 28, 80);
     place(swingLabel, swingSlider, 34, 80);
     place(brightLabel, brightnessSlider, 30, 80);
+    place(variationLabel, variationSlider, 26, 70);
   }
 }
 

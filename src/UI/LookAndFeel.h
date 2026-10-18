@@ -15,6 +15,8 @@ namespace Palette {
   const juce::Colour accent{0xff4d9de0};
   const juce::Colour accentSoft{0xff9fd0f5};
   const juce::Colour accentDim{0xff2c5f8a};
+  const juce::Colour fit{0xff63c9a4};   // muted mint: "fits the project"
+  const juce::Colour star{0xffe3c06d};  // warm gold: favourites
   const juce::Colour textPrimary{0xffe9eff5};
   const juce::Colour textSecondary{0xff8fa0b3};
 }

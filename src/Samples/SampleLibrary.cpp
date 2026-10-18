@@ -167,4 +167,29 @@ juce::String SampleLibrary::parseKey(const juce::String& fileName) {
   return {};
 }
 
+juce::StringArray SampleLibrary::getFavorites() const {
+  const juce::ScopedLock sl(favLock);
+  return favorites;
+}
+
+void SampleLibrary::setFavorites(const juce::StringArray& newFavorites) {
+  const juce::ScopedLock sl(favLock);
+  favorites = newFavorites;
+}
+
+bool SampleLibrary::isFavorite(const juce::String& path) const {
+  const juce::ScopedLock sl(favLock);
+  return favorites.contains(path);
+}
+
+bool SampleLibrary::toggleFavorite(const juce::String& path) {
+  const juce::ScopedLock sl(favLock);
+  if (favorites.contains(path)) {
+    favorites.removeString(path);
+    return false;
+  }
+  favorites.add(path);
+  return true;
+}
+
 } // namespace MidiForge

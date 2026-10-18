@@ -110,6 +110,7 @@ struct SessionIdea {
   double strum{0.0}; // beats offset 0-0.25
   int strumDir{0};   // 0 up, 1 down, 2 random
   double brightness{0.6}; // 0-1: higher = brighter voicings, more extensions, hotter velocity
+  float creativity{0.0f}; // 0-1 "Variacion": extra deterministic humanisation after generation
   // Curated content selection (drives Replace). -1 = not yet chosen.
   int progressionIdx{-1};
   int drumPatternIdx{-1};

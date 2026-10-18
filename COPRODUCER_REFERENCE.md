@@ -36,9 +36,9 @@ sesion y tu decides. MidiForge cubre la otra mitad: ideas MIDI completas
 | --- | --- | --- |
 | Genera MIDI | No | Si (offline, seeded, personajes Detroit/Plugg/Rage/TrapLatino...) |
 | Samples | Nube Output (suscripcion) | Tu disco (indexado) + enlaces de busqueda legales |
-| Session-aware | Analiza el audio de la sesion | No; conoce su propia idea (key/BPM/barras) |
-| Audicion de samples | Si, integrada | No (futuro) |
-| Organizacion | Colecciones, orden por key/BPM | Filtros BPM/Key + busqueda local |
+| Session-aware | Analiza el audio de la sesion | Lee el BPM del host; conoce su idea (key/barras) |
+| Audicion de samples | Si, integrada | Si (doble clic, salida del plugin) |
+| Organizacion | Colecciones, orden por key/BPM | Favoritos + chip FIT + similares + filtros BPM/Key |
 | IA | Nube | 100% offline, algoritmica |
 | Coste | Suscripcion mensual | Gratis, personal |
 
@@ -54,11 +54,12 @@ sesion y tu decides. MidiForge cubre la otra mitad: ideas MIDI completas
    del plugin, lista de favoritos. Inspirado en Custom Collections.
 4. **Buscar similares**: accion en la fila (mismo folder + base name +
    BPM parecido) al estilo "Similar Sounds".
-5. **Slider de Creatividad**: mapear un control "cuanto se aleja la variacion"
-   a nuestro randomness (jitter/ghosts/densidad). Inspirado en Re-imagine.
-6. **Audicion dentro del plugin** (mayor esfuerzo): reproducir el WAV
-   seleccionado; requiere que el plugin saque audio por su salida. Valorar
-   segun como este configurado MidiForge en FL.
+5. **Slider de Creatividad**: control "cuanto se aleja la variacion"
+   (humanizacion determinista extra: velocity, micro-timing, octavas).
+   Inspirado en Re-imagine. Hecho como slider **Var** (0 = neutral).
+6. **Audicion dentro del plugin**: reproducir el archivo seleccionado por la
+   salida del plugin (AudioFormatManager + AudioTransportSource en
+   processBlock). Hecho: doble clic en la fila o menu contextual.
 
 ## 4. Limites que nos autoimponemos
 
@@ -66,11 +67,13 @@ sesion y tu decides. MidiForge cubre la otra mitad: ideas MIDI completas
 - No pedir cuenta/suscripcion de Output.
 - No copiar su interfaz al detalle; MidiForge tiene ya su tema propio (Acero).
 
-## 5. Plan propuesto
+## 5. Estado del plan
 
-- Cuando lo instales: sesion A/B en FL (una idea MidiForge en tu BPM/key vs
-  las sugerencias de Co-Producer) y capturas de su UI.
-- Con las capturas: pase de diseno (chips, orden por fit, colecciones) sobre
-  el tema Acero.
-- Implementar en este orden: 1 (BPM host) -> 2 (fit) -> 3 (favoritos)
-  -> 4 (similares); 5 y 6 a decidir.
+- [x] 1 BPM host (cache del playhead + "Proyecto: X BPM" en el navegador)
+- [x] 2 FIT (chip verde + filtro + orden por cercania de tempo y key)
+- [x] 3 Favoritos (estrella + filtro + persistidos en el estado, v0.5.0)
+- [x] 4 Similares (menu contextual; mismo nombre/BPM/folder, orden por score)
+- [x] 5 Slider Var (variacion determinista; 0 = neutral)
+- [x] 6 Audicion (doble clic; audio por la salida del plugin)
+- [ ] Sesion A/B en FL cuando instales Co-Producer (capturas como referencia)
+- [ ] Descarga legal via Freesound API (bloqueado: falta API key gratuita)

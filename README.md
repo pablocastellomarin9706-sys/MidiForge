@@ -9,7 +9,7 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
 
 - [x] Estructura CMake + JUCE
 - [x] Generador offline (Chords / Melody / Bass / Drums) con seed determinista
-- [x] UI oscura (Header + Sidebar + Tabs) + panel de chat
+- [x] UI "Acero azul minimal" (Header + Sidebar + Tabs) + panel de chat
 - [x] Librería curada de progresiones y patrones por estilo
 - [x] Juice (brillo) + Swing + Humanize + Replace por track
 - [x] **Forge Chat** offline (ES/EN): ideas, replace, mute/solo, variaciones, parámetros
@@ -20,6 +20,9 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
       YouTube / SoundCloud (abre el navegador; el plugin nunca accede a internet)
 - [x] **Navegador de samples local**: indexa tus carpetas en segundo plano,
       detecta BPM/key por nombre, filtros y **drag de audio directo a FL**
+- [x] **Co-Producer style (offline)**: BPM del proyecto + chip **FIT**, favoritos
+      persistidos, **buscar similares**, slider **Var** (variacion) y **audicion**
+      de samples dentro del plugin (doble clic)
 - [x] Drag & drop de MIDI (temp `.mid` → drag nativo de Windows)
 - [ ] Descarga legal desde Freesound API (requiere API key gratuita)
 - [ ] Mini editor de piano roll editable (fase siguiente)
@@ -61,13 +64,19 @@ build/MidiForge_artefacts/Release/VST3/MidiForge.vst3
 ## Uso
 
 1. Abre MidiForge en el Channel Rack o en un slot de mezcla.
-2. Ajusta **Key**, **Scale**, **Style**, **Bars**, **Seed** y **Juice**, o pide ideas
+2. Ajusta **Key**, **Scale**, **Style**, **Bars**, **Seed**, **Juice** y **Var**, o pide ideas
    en el **Forge Chat** (por ejemplo: *"trap oscuro en F menor"*).
 3. Elige **Caracter** en la barra lateral (Detroit, Trap Oscuro, Plugg, Nu-Jerk,
    Boom Bap, Rage, Trap Latino) para el "sabor" del beat: swing, timing humano,
    ghost hats, 808 glides.
 4. Ve a la pestaña **SAMPLES** para navegar tu carpeta de musica (indexado en
    segundo plano, filtros de BPM/key) y **arrastra el archivo a la Playlist de FL**.
+   - **FIT**: chip verde + filtro para los samples que cuadran con el BPM del
+     proyecto (dale al play en FL una vez para que el plugin lea el tempo).
+   - **Estrella** (columna izquierda): favoritos persistentes; filtro **Favoritos**.
+   - **Clic derecho** en una fila: *Buscar similares*, escuchar/parar, anadir a
+     favoritos o revelar en el explorador.
+   - **Doble clic** en una fila: audicion dentro del plugin (otra vez, para).
 5. Pulsa **Replace** en cualquier track para obtener otra variante de esa capa.
 6. Arrastra desde **"Drag MIDI → Track"** hasta el **Piano Roll** de FL.
 
@@ -106,7 +115,11 @@ src/
   el archivo de audio original para samples (FL lo copia al proyecto).
 - El generador es determinista respecto a la `seed`; el Carácter aplica un
   post-proceso de humanización (jitter, velocity, longitudes, ghost hats).
-- Las carpetas del navegador de samples se guardan con el estado del plugin.
+- Las carpetas del navegador y los **favoritos** se guardan con el estado del plugin.
+- **Var** (variacion) por defecto 0 (neutral): suma humanizacion determinista
+  (velocity, micro-timing, octavas) sobre la idea generada sin tocar la seed.
+- La **audicion** reproduce el archivo por la salida del plugin (doble clic);
+  formatos: wav/aif/aiff/mp3/ogg/flac (lectores basicos de JUCE).
 - El chat es un parser de intenciones 100 % local (sin red).
 - Sample Scout solo **abre el navegador** con la búsqueda preparada.
 - Límite de indexado: 40.000 archivos de audio (wav/aif/aiff/mp3/ogg/flac).
