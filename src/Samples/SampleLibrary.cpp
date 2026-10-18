@@ -138,7 +138,7 @@ juce::String SampleLibrary::parseKey(const juce::String& fileName) {
   for (int k = 0; k < toks.size(); ++k) {
     auto t = toks[k].toLowerCase();
     if (t.isEmpty() || t.length() > 6) continue;
-    const juce_wchar c0 = t[0];
+    const auto c0 = t[0];
     if (c0 < 'a' || c0 > 'g') continue;
 
     juce::String acc;

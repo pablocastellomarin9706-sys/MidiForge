@@ -19,7 +19,8 @@ public:
 
   void mouseDrag(const juce::MouseEvent& e) override {
     if (onDragRow) {
-      auto row = getRowContainingPosition(e.getMouseDownPosition());
+      auto p = e.getMouseDownPosition();
+      auto row = getRowContainingPosition(p.x, p.y);
       if (row >= 0) onDragRow(row);
     }
   }
