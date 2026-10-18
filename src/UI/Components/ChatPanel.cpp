@@ -76,9 +76,23 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
 }
 
 void ChatPanel::paint(juce::Graphics& g) {
-  g.fillAll(Palette::panelAlt);
-  g.setColour(Palette::border);
-  g.drawVerticalLine(0, 0.0f, (float)getHeight());
+  auto r = getLocalBounds().toFloat();
+
+  juce::ColourGradient bg(Palette::panelAlt.brighter(0.03f), r.getX(), r.getY(),
+                          Palette::panelAlt.darker(0.18f), r.getX(), r.getBottom(), false);
+  g.setGradientFill(bg);
+  g.fillRect(r);
+
+  // Left edge: steel light fading from the middle.
+  juce::ColourGradient top(Palette::accent.withAlpha(0.0f), 0.0f, r.getY(),
+                           Palette::accent.withAlpha(0.55f), 0.0f, r.getCentreY(), false);
+  g.setGradientFill(top);
+  g.fillRect(0.0f, r.getY(), 1.0f, r.getHeight() * 0.5f);
+
+  juce::ColourGradient bottom(Palette::accent.withAlpha(0.55f), 0.0f, r.getCentreY(),
+                              Palette::accent.withAlpha(0.0f), 0.0f, r.getBottom(), false);
+  g.setGradientFill(bottom);
+  g.fillRect(0.0f, r.getCentreY(), 1.0f, r.getHeight() * 0.5f);
 }
 
 void ChatPanel::resized() {

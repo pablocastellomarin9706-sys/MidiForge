@@ -39,7 +39,31 @@ MainComponent::MainComponent(MidiForgeAudioProcessor& p) : processor(p) {
 }
 
 void MainComponent::paint(juce::Graphics& g) {
-  g.fillAll(Palette::background);
+  auto r = getLocalBounds().toFloat();
+
+  // Steel gradient base.
+  juce::ColourGradient base(Palette::background.brighter(0.03f), r.getX(), r.getY(),
+                            Palette::background.darker(0.25f), r.getX(), r.getBottom(), false);
+  g.setGradientFill(base);
+  g.fillRect(r);
+
+  // Brushed metal diagonal lines (very subtle).
+  g.setColour(juce::Colours::white.withAlpha(0.012f));
+  for (float x = -r.getHeight(); x < r.getWidth(); x += 11.0f)
+    g.drawLine(x, r.getBottom(), x + r.getHeight(), r.getY(), 1.0f);
+
+  // Cold glow behind the header.
+  juce::ColourGradient glow(Palette::accent.withAlpha(0.10f), r.getWidth() * 0.35f, -60.0f,
+                            Palette::accent.withAlpha(0.0f), r.getWidth() * 0.35f,
+                            r.getHeight() * 0.55f, false);
+  g.setGradientFill(glow);
+  g.fillRect(r);
+
+  // Vignette towards the corners.
+  juce::ColourGradient vig(juce::Colours::transparentBlack, r.getCentreX(), r.getCentreY(),
+                           juce::Colours::black.withAlpha(0.28f), r.getX(), r.getBottom(), true);
+  g.setGradientFill(vig);
+  g.fillRect(r);
 }
 
 void MainComponent::resized() {

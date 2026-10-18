@@ -33,13 +33,22 @@ void TrackPage::refresh() {
 }
 
 void TrackPage::paint(juce::Graphics& g) {
-  g.fillAll(Palette::panel);
+  auto full = getLocalBounds().toFloat();
+  juce::ColourGradient bg(Palette::panel.brighter(0.02f), full.getX(), full.getY(),
+                          Palette::panel.darker(0.12f), full.getX(), full.getBottom(), false);
+  g.setGradientFill(bg);
+  g.fillRect(full);
+
   auto r = getLocalBounds().reduced(12).removeFromTop(18);
-  g.setFont(juce::Font(juce::FontOptions(12.0f)));
-  g.setColour(Palette::textSecondary);
-  g.drawText(trackName, r.removeFromLeft(90), juce::Justification::centredLeft);
+  auto nameArea = r.removeFromLeft(90);
+  g.setColour(Palette::accent);
+  g.fillEllipse((float)nameArea.getX(), (float)nameArea.getCentreY() - 2.5f, 5.0f, 5.0f);
+  g.setFont(juce::Font(juce::FontOptions(12.0f, juce::Font::bold)));
+  g.setColour(Palette::textPrimary);
+  g.drawText(trackName, nameArea.withTrimmedLeft(10), juce::Justification::centredLeft);
   if (detailText.isNotEmpty()) {
-    g.setColour(Palette::accentDim);
+    g.setColour(Palette::accentSoft.withAlpha(0.75f));
+    g.setFont(juce::Font(juce::FontOptions(12.0f)));
     g.drawText(detailText, r, juce::Justification::centredLeft);
   }
 }

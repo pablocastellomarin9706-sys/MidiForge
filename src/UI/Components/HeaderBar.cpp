@@ -8,10 +8,12 @@ static const char* scaleNames[] = {"Major","Minor","Dorian","Mixolydian","Pent M
 static const char* styleNames[] = {"Pop","LoFi","House","HipHop","EDM","Rock"};
 
 HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
+  // The logo is painted by hand (badge + two-tone wordmark); this label only
+  // reserves the layout bounds.
   titleLabel.setText("MidiForge", juce::dontSendNotification);
-  titleLabel.setFont(juce::Font(juce::FontOptions(22.0f, juce::Font::bold)));
-  titleLabel.setColour(juce::Label::textColourId, Palette::accent);
-  addAndMakeVisible(titleLabel);
+  titleLabel.setVisible(false);
+
+  startTimerHz(20);
 
   auto reroll = [this](bool newSeed) {
     auto& idea = processor.getCurrentIdea();
@@ -144,9 +146,87 @@ void HeaderBar::refreshFromIdea() {
 }
 
 void HeaderBar::paint(juce::Graphics& g) {
-  g.fillAll(Palette::panel);
-  g.setColour(Palette::border);
-  g.drawHorizontalLine(getHeight() - 1, 0.0f, (float)getWidth());
+  auto r = getLocalBounds().toFloat();
+
+  // Steel panel gradient.
+  juce::ColourGradient bg(Palette::panel.brighter(0.04f), r.getX(), r.getY(),
+                          Palette::panel.darker(0.18f), r.getX(), r.getBottom(), false);
+  g.setGradientFill(bg);
+  g.fillRect(r);
+
+  // Slow cold sheen sweeping across the metal.
+  const float sheenX = -240.0f + (float)sheenPhase * (r.getWidth() + 480.0f);
+  {
+    juce::ColourGradient left(juce::Colours::white.withAlpha(0.0f), sheenX - 160.0f, 0.0f,
+                              juce::Colours::white.withAlpha(0.035f), sheenX, 0.0f, false);
+    g.setGradientFill(left);
+    g.fillRect(0.0f, 0.0f, juce::jmax(0.0f, sheenX), r.getHeight());
+
+    juce::ColourGradient right(juce::Colours::white.withAlpha(0.035f), sheenX, 0.0f,
+                               juce::Colours::white.withAlpha(0.0f), sheenX + 160.0f, 0.0f, false);
+    g.setGradientFill(right);
+    g.fillRect(juce::jmax(0.0f, sheenX), 0.0f,
+               juce::jmax(0.0f, r.getWidth() - sheenX), r.getHeight());
+  }
+
+  // Bottom edge: steel light fading out from the centre.
+  {
+    juce::ColourGradient l(juce::Colours::transparentBlack, r.getX(), 0.0f,
+                           Palette::accent.withAlpha(0.85f), r.getCentreX(), 0.0f, false);
+    g.setGradientFill(l);
+    g.fillRect(r.getX(), r.getBottom() - 1.0f, r.getWidth() * 0.5f, 1.0f);
+
+    juce::ColourGradient r2(Palette::accent.withAlpha(0.85f), r.getCentreX(), 0.0f,
+                            juce::Colours::transparentBlack, r.getRight(), 0.0f, false);
+    g.setGradientFill(r2);
+    g.fillRect(r.getCentreX(), r.getBottom() - 1.0f, r.getWidth() * 0.5f, 1.0f);
+  }
+
+  // Logo: accent badge with a spark, then the two-tone wordmark.
+  auto tb = titleLabel.getBounds();
+  if (tb.getWidth() > 40) {
+    auto badge = juce::Rectangle<float>((float)tb.getX(), (float)tb.getCentreY() - 14.0f, 28.0f, 28.0f);
+    g.setGradientFill(juce::ColourGradient(Palette::accentSoft, badge.getX(), badge.getY(),
+                                           Palette::accent.darker(0.2f), badge.getRight(),
+                                           badge.getBottom(), false));
+    g.fillRoundedRectangle(badge, 8.0f);
+    g.setColour(Palette::accentSoft.withAlpha(0.35f));
+    g.drawRoundedRectangle(badge.expanded(1.0f), 9.0f, 1.0f);
+
+    const float cx = badge.getCentreX(), cy = badge.getCentreY();
+    juce::Path spark;
+    spark.startNewSubPath(cx, cy - 8.5f);
+    spark.lineTo(cx + 2.8f, cy - 2.8f);
+    spark.lineTo(cx + 8.5f, cy);
+    spark.lineTo(cx + 2.8f, cy + 2.8f);
+    spark.lineTo(cx, cy + 8.5f);
+    spark.lineTo(cx - 2.8f, cy + 2.8f);
+    spark.lineTo(cx - 8.5f, cy);
+    spark.lineTo(cx - 2.8f, cy - 2.8f);
+    spark.closeSubPath();
+    g.setColour(Palette::background);
+    g.fillPath(spark);
+
+    auto textArea = tb.withTrimmedLeft(38);
+    auto fontBold = juce::Font(juce::FontOptions(21.0f, juce::Font::bold));
+    juce::TextLayout tl;
+    tl.createLayout(fontBold, 200.0f, juce::Justification::centredLeft, "Midi");
+    const int midiW = (int)tl.getWidth();
+
+    g.setFont(fontBold);
+    g.setColour(Palette::textPrimary);
+    g.drawText("Midi", textArea, juce::Justification::centredLeft);
+
+    g.setFont(juce::Font(juce::FontOptions(21.0f, juce::Font::plain)));
+    g.setColour(Palette::accent);
+    g.drawText("Forge", textArea.withTrimmedLeft(midiW + 3), juce::Justification::centredLeft);
+  }
+}
+
+void HeaderBar::timerCallback() {
+  sheenPhase += 0.010;
+  if (sheenPhase > 1.55) sheenPhase = -0.55;
+  repaint();
 }
 
 void HeaderBar::resized() {

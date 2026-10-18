@@ -19,7 +19,7 @@ MidiForgeAudioProcessorEditor::~MidiForgeAudioProcessorEditor() {
 }
 
 void MidiForgeAudioProcessorEditor::paint(juce::Graphics& g) {
-  g.fillAll(juce::Colour(0xff0f0f0f));
+  g.fillAll(Palette::background);
 }
 
 void MidiForgeAudioProcessorEditor::resized() {

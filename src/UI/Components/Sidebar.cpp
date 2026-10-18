@@ -73,16 +73,36 @@ void Sidebar::refreshFromIdea() {
 int Sidebar::getNumRows() { return history.size(); }
 
 void Sidebar::paintListBoxItem(int row, juce::Graphics& g, int width, int height, bool selected) {
-  if(selected) { g.setColour(Palette::accent.withAlpha(0.3f)); g.fillRect(0,0,width,height); }
-  g.setColour(Palette::textSecondary);
-  g.setFont(juce::Font(juce::FontOptions(13.0f)));
-  g.drawText(history[row], 10, 0, width-10, height, juce::Justification::centredLeft);
+  auto r = juce::Rectangle<float>(0.0f, 0.0f, (float)width, (float)height).reduced(2.0f, 1.0f);
+  if(selected) {
+    g.setColour(Palette::accent.withAlpha(0.16f));
+    g.fillRoundedRectangle(r, 5.0f);
+    g.setColour(Palette::accent);
+    g.fillRoundedRectangle(r.withWidth(3.0f).reduced(0.0f, 3.0f), 1.5f);
+  }
+  g.setColour(selected ? Palette::textPrimary : Palette::textSecondary);
+  g.setFont(juce::Font(juce::FontOptions(12.5f)));
+  g.drawText(history[row], 14, 0, width - 16, height, juce::Justification::centredLeft);
 }
 
 void Sidebar::paint(juce::Graphics& g) {
-  g.fillAll(Palette::panelAlt);
-  g.setColour(Palette::border);
-  g.drawVerticalLine(getWidth()-1, 0.0f, (float)getHeight());
+  auto r = getLocalBounds().toFloat();
+
+  juce::ColourGradient bg(Palette::panelAlt.brighter(0.03f), r.getX(), r.getY(),
+                          Palette::panelAlt.darker(0.18f), r.getX(), r.getBottom(), false);
+  g.setGradientFill(bg);
+  g.fillRect(r);
+
+  // Right edge: steel light fading from the middle.
+  juce::ColourGradient top(Palette::accent.withAlpha(0.0f), r.getRight() - 1.0f, r.getY(),
+                           Palette::accent.withAlpha(0.45f), r.getRight() - 1.0f, r.getCentreY(), false);
+  g.setGradientFill(top);
+  g.fillRect(r.getRight() - 1.0f, r.getY(), 1.0f, r.getHeight() * 0.5f);
+
+  juce::ColourGradient bottom(Palette::accent.withAlpha(0.45f), r.getRight() - 1.0f, r.getCentreY(),
+                              Palette::accent.withAlpha(0.0f), r.getRight() - 1.0f, r.getBottom(), false);
+  g.setGradientFill(bottom);
+  g.fillRect(r.getRight() - 1.0f, r.getCentreY(), 1.0f, r.getHeight() * 0.5f);
 }
 
 void Sidebar::resized() {

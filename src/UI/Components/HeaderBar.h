@@ -5,7 +5,7 @@
 
 namespace MidiForge {
 
-class HeaderBar : public juce::Component {
+class HeaderBar : public juce::Component, private juce::Timer {
 public:
   explicit HeaderBar(MidiForgeAudioProcessor& p);
   void paint(juce::Graphics&) override;
@@ -16,6 +16,8 @@ public:
   std::function<void()> onChatToggle;
 
 private:
+  void timerCallback() override;
+
   MidiForgeAudioProcessor& processor;
   juce::TextButton generateButton{"GENERATE"};
   juce::TextButton shuffleButton{"Shuffle"};
@@ -24,6 +26,8 @@ private:
   juce::ComboBox keyBox, scaleBox, styleBox;
   juce::Slider barsSlider, seedSlider, swingSlider, brightnessSlider;
   juce::Label keyLabel, scaleLabel, styleLabel, barsLabel, seedLabel, swingLabel, brightLabel;
+
+  double sheenPhase{0.0};
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HeaderBar)
 };
