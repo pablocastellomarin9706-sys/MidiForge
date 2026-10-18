@@ -36,7 +36,10 @@ static void applyCharacterToTrack(SessionIdea& idea, TrackIdea& t, RandomGen& rn
   if (!P.valid) return;
 
   const bool isDrums = (t.name == "Drums");
+  const bool isBass = (t.name == "Bass");
+  const bool isMelody = (t.name == "Melody");
   const double jit = P.jitter * (isDrums ? 0.5 : 1.0);
+  const double patternEnd = (double)(idea.bars > 0 ? idea.bars : 4) * 4.0;
 
   for (auto& n : t.notes) {
     if (jit > 0.0) {
@@ -44,9 +47,24 @@ static void applyCharacterToTrack(SessionIdea& idea, TrackIdea& t, RandomGen& rn
       n.start = juce::jmax(0.0, n.start + j);
     }
     n.velocity = juce::jlimit(1, 127, n.velocity + rng.nextInt(-P.velSigma, P.velSigma));
-    n.length = juce::jmax(0.05, n.length * P.lenScale);
-    if (t.name == "Melody" && P.octaveShift != 0)
+    const double lenScale = isBass ? P.bassLenScale : P.lenScale;
+    n.length = juce::jmax(0.05, n.length * lenScale);
+    if (n.start + n.length > patternEnd)
+      n.length = juce::jmax(0.05, patternEnd - n.start);
+    if (isMelody && P.octaveShift != 0)
       n.pitch = juce::jlimit(0, 127, n.pitch + 12 * P.octaveShift);
+  }
+
+  // Air: thin out melody notes (Pi'erre-style space). Keeps at least 6 notes.
+  if (isMelody && P.density < 1.0 && t.notes.size() > 8) {
+    std::vector<Note> kept;
+    kept.reserve(t.notes.size());
+    for (size_t i = 0; i < t.notes.size(); ++i) {
+      const bool keep = rng.nextDouble() <= P.density;
+      if (!keep && kept.size() >= 6 && (i + 1) < t.notes.size()) continue;
+      kept.push_back(t.notes[i]);
+    }
+    t.notes.swap(kept);
   }
 
   if (isDrums && P.ghostProb > 0.0) {

@@ -13,8 +13,9 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
 - [x] Librería curada de progresiones y patrones por estilo
 - [x] Juice (brillo) + Swing + Humanize + Replace por track
 - [x] **Forge Chat** offline (ES/EN): ideas, replace, mute/solo, variaciones, parámetros
-- [x] **Character presets**: Detroit / Trap Oscuro / Plugg / Nu-Jerk / Boom Bap
-      (swing, jitter humano, velocity, ghost hats, salto de octava)
+- [x] **Character presets** (7): Detroit / Trap Oscuro / Plugg / Nu-Jerk / Boom Bap /
+      Rage / Trap Latino — swing, jitter humano, velocity, ghost hats, 808 glides
+      y aire melodico; calibrados con tus referencias (`REFERENCES.md`)
 - [x] **Sample Scout**: búsquedas en Splice / Freesound / Loopcloud / Samplette /
       YouTube / SoundCloud (abre el navegador; el plugin nunca accede a internet)
 - [x] **Navegador de samples local**: indexa tus carpetas en segundo plano,
@@ -63,7 +64,8 @@ build/MidiForge_artefacts/Release/VST3/MidiForge.vst3
 2. Ajusta **Key**, **Scale**, **Style**, **Bars**, **Seed** y **Juice**, o pide ideas
    en el **Forge Chat** (por ejemplo: *"trap oscuro en F menor"*).
 3. Elige **Caracter** en la barra lateral (Detroit, Trap Oscuro, Plugg, Nu-Jerk,
-   Boom Bap) para el "sabor" del beat: swing, timing humano, ghost hats.
+   Boom Bap, Rage, Trap Latino) para el "sabor" del beat: swing, timing humano,
+   ghost hats, 808 glides.
 4. Ve a la pestaña **SAMPLES** para navegar tu carpeta de musica (indexado en
    segundo plano, filtros de BPM/key) y **arrastra el archivo a la Playlist de FL**.
 5. Pulsa **Replace** en cualquier track para obtener otra variante de esa capa.
@@ -75,6 +77,8 @@ build/MidiForge_artefacts/Release/VST3/MidiForge.vst3
 | --- | --- |
 | `trap oscuro en F menor` | Nuevo beat: estilo, carácter, tonalidad y brillo |
 | `hazme algo detroit` / `boom bap oscuro` | Cambia el Carácter (swing + humanize + ghost hats) |
+| `un beat latino` / `trap latino oscuro` | Carácter Trap Latino (menor armónica + 808 glides) |
+| `algo rage` / `estilo yeat` | Carácter Rage (lead oscuro, 808 duro) |
 | `hazme house alegre de 8 compases` | Nueva idea House en mayor, 8 compases |
 | `cambia la melodia` / `otra bateria` | Replace solo de esa capa |
 | `solo bateria y bajo` / `quita los acordes` | Silencia capas (persiste al regenerar) |

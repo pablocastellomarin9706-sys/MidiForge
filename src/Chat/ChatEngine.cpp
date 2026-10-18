@@ -239,8 +239,10 @@ bool matchCharacter(const juce::String& s, Character& out) {
   if (hasAny(s, {"sin caracter","caracter normal"})) { out = Character::None; return true; }
   if (hasAny(s, {"boom bap","boombap","boom-bap"})) { out = Character::BoomBap; return true; }
   if (hasAny(s, {"detroit"})) { out = Character::Detroit; return true; }
-  if (hasAny(s, {"plugg"})) { out = Character::Plugg; return true; }
-  if (hasAny(s, {"jerk"})) { out = Character::NuJerk; return true; }
+  if (hasAny(s, {"plugg","pierre","carti"})) { out = Character::Plugg; return true; }
+  if (hasAny(s, {"jerk","fakemink","skrilla"})) { out = Character::NuJerk; return true; }
+  if (hasAny(s, {"trap latino","latino","espanol","español","latin","dembow","el bugg","jc reyes"})) { out = Character::TrapLatino; return true; }
+  if (hasAny(s, {"rage","yeat"})) { out = Character::Rage; return true; }
   if (hasAny(s, {"trap oscuro","trap dark","dark trap","trap"})) { out = Character::TrapDark; return true; }
   return false;
 }
@@ -448,6 +450,9 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
         idea.style = Style::HipHop;
         const auto cp = Content::characterPresetOf(ch);
         if (cp.valid) idea.swing = cp.swing;
+        // Latin trap leans on harmonic minor colours by default.
+        if (ch == Character::TrapLatino && idea.scale == ScaleType::Major)
+          idea.scale = ScaleType::MinorHarmonic;
       }
     }
 

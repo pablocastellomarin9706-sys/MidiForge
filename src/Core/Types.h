@@ -54,7 +54,9 @@ enum class Character {
   TrapDark,
   Plugg,
   NuJerk,
-  BoomBap
+  BoomBap,
+  Rage,
+  TrapLatino
 };
 
 inline juce::String characterName(Character c) {
@@ -65,6 +67,8 @@ inline juce::String characterName(Character c) {
     case Character::Plugg: return "Plugg";
     case Character::NuJerk: return "Nu-Jerk";
     case Character::BoomBap: return "Boom Bap";
+    case Character::Rage: return "Rage";
+    case Character::TrapLatino: return "Trap Latino";
   }
   return "None";
 }

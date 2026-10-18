@@ -21,6 +21,8 @@ Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("histor
   charBox.addItem("Plugg", 4);
   charBox.addItem("Nu-Jerk", 5);
   charBox.addItem("Boom Bap", 6);
+  charBox.addItem("Rage", 7);
+  charBox.addItem("Trap Latino", 8);
   charBox.setSelectedId(1, juce::dontSendNotification);
   charBox.onChange = [this] {
     Character ch = Character::None;
@@ -30,6 +32,8 @@ Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("histor
       case 4: ch = Character::Plugg; break;
       case 5: ch = Character::NuJerk; break;
       case 6: ch = Character::BoomBap; break;
+      case 7: ch = Character::Rage; break;
+      case 8: ch = Character::TrapLatino; break;
       default: ch = Character::None; break;
     }
     auto& idea = processor.getCurrentIdea();
@@ -38,6 +42,8 @@ Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("histor
       idea.style = Style::HipHop;
       const auto cp = Content::characterPresetOf(ch);
       if (cp.valid) idea.swing = cp.swing;
+      if (ch == Character::TrapLatino && idea.scale == ScaleType::Major)
+        idea.scale = ScaleType::MinorHarmonic;
     }
     processor.generateFull();
     if (onIdeaChanged) onIdeaChanged();
@@ -56,6 +62,8 @@ void Sidebar::refreshFromIdea() {
     case Character::Plugg: id = 4; break;
     case Character::NuJerk: id = 5; break;
     case Character::BoomBap: id = 6; break;
+    case Character::Rage: id = 7; break;
+    case Character::TrapLatino: id = 8; break;
     case Character::None: id = 1; break;
   }
   if (charBox.getSelectedId() != id)
