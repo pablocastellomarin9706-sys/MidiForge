@@ -6,6 +6,9 @@
 #include "../Core/MusicTheory.h"
 #include "../Content/Progressions.h"
 #include "../Content/Patterns.h"
+#include "../Content/Characters.h"
+
+#include <algorithm>
 
 namespace MidiForge {
 
@@ -25,6 +28,53 @@ static void restoreFlags(std::vector<TrackIdea>& tracks, const std::vector<Track
     t.mute = flagOf(oldTracks, t.name, &TrackIdea::mute);
     t.solo = flagOf(oldTracks, t.name, &TrackIdea::solo);
   }
+}
+
+// Character DNA: human jitter, velocity spread, note length, ghost hats.
+static void applyCharacterToTrack(SessionIdea& idea, TrackIdea& t, RandomGen& rng) {
+  const auto P = Content::characterPresetOf(idea.character);
+  if (!P.valid) return;
+
+  const bool isDrums = (t.name == "Drums");
+  const double jit = P.jitter * (isDrums ? 0.5 : 1.0);
+
+  for (auto& n : t.notes) {
+    if (jit > 0.0) {
+      const double j = jit * (double)rng.nextInt(-100, 100) / 100.0;
+      n.start = juce::jmax(0.0, n.start + j);
+    }
+    n.velocity = juce::jlimit(1, 127, n.velocity + rng.nextInt(-P.velSigma, P.velSigma));
+    n.length = juce::jmax(0.05, n.length * P.lenScale);
+    if (t.name == "Melody" && P.octaveShift != 0)
+      n.pitch = juce::jlimit(0, 127, n.pitch + 12 * P.octaveShift);
+  }
+
+  if (isDrums && P.ghostProb > 0.0) {
+    const int bars = idea.bars > 0 ? idea.bars : 4;
+    for (int bar = 0; bar < bars; ++bar) {
+      for (int step = 0; step < 16; ++step) {
+        if (step % 4 == 0) continue;
+        const double start = (double)bar * 4.0 + (double)step * 0.25;
+        bool occupied = false;
+        for (const auto& n : t.notes) {
+          if (n.start > start - 0.06 && n.start < start + 0.06) { occupied = true; break; }
+        }
+        if (occupied) continue;
+        if (rng.nextDouble() < P.ghostProb * 0.5) {
+          t.notes.push_back({Content::kHat, start, 0.08, 34 + rng.nextInt(0, 12), 10});
+        }
+      }
+    }
+  }
+
+  std::sort(t.notes.begin(), t.notes.end(),
+            [](const Note& a, const Note& b) { return a.start < b.start; });
+}
+
+static void applyCharacterPost(SessionIdea& idea, RandomGen& rng) {
+  const auto P = Content::characterPresetOf(idea.character);
+  if (!P.valid) return;
+  for (auto& t : idea.tracks) applyCharacterToTrack(idea, t, rng);
 }
 
 void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
@@ -73,6 +123,7 @@ void IdeaGenerator::generateFull(SessionIdea& idea) {
   RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
   pickAll(idea, rng);
   runAll(idea, rng);
+  applyCharacterPost(idea, rng);
   restoreFlags(idea.tracks, oldTracks);
 }
 
@@ -118,6 +169,10 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     DrumGenerator dg; dg.generate(idea, rng);
   }
 
+  const bool chordsFamily = (trackName == "Chords");
+  for (auto& t : idea.tracks)
+    if (t.name == trackName || (chordsFamily && t.name == "Bass"))
+      applyCharacterToTrack(idea, t, rng);
   restoreFlags(idea.tracks, oldTracks);
 }
 

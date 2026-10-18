@@ -15,15 +15,21 @@ MainComponent::MainComponent(MidiForgeAudioProcessor& p) : processor(p) {
 
   header->onIdeaChanged = [this] {
     if(tabsView) tabsView->refreshAll();
+    if(sidebar) sidebar->refreshFromIdea();
   };
   header->onChatToggle = [this] {
     chatVisible = !chatVisible;
     chat->setVisible(chatVisible);
     resized();
   };
+  sidebar->onIdeaChanged = [this] {
+    header->refreshFromIdea();
+    tabsView->refreshAll();
+  };
   chat->onIdeaChanged = [this] {
     header->refreshFromIdea();
     tabsView->refreshAll();
+    sidebar->refreshFromIdea();
   };
 
   // Generate an initial idea so the UI shows something on open.

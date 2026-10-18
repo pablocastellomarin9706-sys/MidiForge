@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 0.3.0
+  VERSION 0.4.0
   LANGUAGES CXX
 )
 
@@ -59,6 +59,7 @@ target_sources(MidiForge
     src/Content/Progressions.h
     src/Content/Patterns.cpp
     src/Content/Patterns.h
+    src/Content/Characters.h
     src/Generator/ChordGenerator.cpp
     src/Generator/ChordGenerator.h
     src/Generator/MelodyGenerator.cpp
@@ -95,6 +96,10 @@ target_sources(MidiForge
     src/UI/Components/DragHandle.h
     src/UI/Components/ChatPanel.cpp
     src/UI/Components/ChatPanel.h
+    src/UI/Components/SampleBrowser.cpp
+    src/UI/Components/SampleBrowser.h
+    src/Samples/SampleLibrary.cpp
+    src/Samples/SampleLibrary.h
 )
 
 target_compile_definitions(MidiForge

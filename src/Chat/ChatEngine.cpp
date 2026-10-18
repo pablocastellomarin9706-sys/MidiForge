@@ -1,5 +1,6 @@
 #include "ChatEngine.h"
 #include "../Core/MusicTheory.h"
+#include "../Content/Characters.h"
 
 #include <initializer_list>
 #include <utility>
@@ -234,6 +235,16 @@ bool matchStyle(const juce::String& s, Style& out) {
   return false;
 }
 
+bool matchCharacter(const juce::String& s, Character& out) {
+  if (hasAny(s, {"sin caracter","caracter normal"})) { out = Character::None; return true; }
+  if (hasAny(s, {"boom bap","boombap","boom-bap"})) { out = Character::BoomBap; return true; }
+  if (hasAny(s, {"detroit"})) { out = Character::Detroit; return true; }
+  if (hasAny(s, {"plugg"})) { out = Character::Plugg; return true; }
+  if (hasAny(s, {"jerk"})) { out = Character::NuJerk; return true; }
+  if (hasAny(s, {"trap oscuro","trap dark","dark trap","trap"})) { out = Character::TrapDark; return true; }
+  return false;
+}
+
 bool matchScale(const juce::StringArray& toks, ScaleType& out) {
   for (const auto& t : toks) {
     if (t == "dorico" || t == "dorian") { out = ScaleType::Dorian; return true; }
@@ -420,14 +431,26 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
   bool keyPcFound = findKey(s, keyPc, &minorHint);
   ScaleType sc;
   bool scaleWord = matchScale(toks, sc);
+  Character ch = idea.character;
+  bool charMatched = matchCharacter(s, ch);
   int mood = moodSign(s);
   bool swingAsk = s.contains("swing") || s.contains("balanceo");
   int newBars = 0;
   bool barsAsk = findBars(s, newBars);
   int bpm = findBpm(s);
 
-  if (wantVariation || wantNew || styleMatched || keyPcFound || scaleWord || mood != 0 || swingAsk || barsAsk) {
+  if (wantVariation || wantNew || styleMatched || keyPcFound || scaleWord || mood != 0 || swingAsk || barsAsk || charMatched) {
     if (styleMatched) idea.style = st;
+
+    if (charMatched) {
+      idea.character = ch;
+      if (ch != Character::None) {
+        idea.style = Style::HipHop;
+        const auto cp = Content::characterPresetOf(ch);
+        if (cp.valid) idea.swing = cp.swing;
+      }
+    }
+
     if (keyPcFound) idea.keyRoot = keyPc;
     if (scaleWord) idea.scale = sc;
     else if (minorHint) idea.scale = ScaleType::MinorNatural;
@@ -446,7 +469,7 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
     }
     if (barsAsk) idea.bars = newBars;
 
-    bool compositional = styleMatched || keyPcFound || scaleWord || minorHint || wantNew;
+    bool compositional = styleMatched || keyPcFound || scaleWord || minorHint || wantNew || charMatched;
     if (compositional) {
       idea.seed = juce::Random::getSystemRandom().nextInt(1000000) + 1;
       idea.take = 0;
@@ -464,6 +487,7 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
 
     juce::StringArray changes;
     if (styleMatched) changes.add("Estilo: " + styleName(idea.style));
+    if (charMatched) changes.add("Carácter: " + characterName(idea.character));
     if (keyPcFound || scaleWord || minorHint)
       changes.add("Tonalidad: " + keyLabelOf(idea) + " - " + scaleLabel(idea.scale));
     if (mood != 0) changes.add("Juice: " + juce::String(juce::roundToInt(idea.brightness * 100.0)) + "%");
@@ -486,6 +510,7 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
                "- 'solo bateria y bajo' / 'quita los acordes'\n"
                "- 'mas swing', 'mas brillo', 'mas oscuro'\n"
                "- 'otra variacion' / 'nueva idea'\n"
+               "- 'hazme algo detroit' / 'boom bap oscuro'\n"
                "- 'busca hi-hats oscuros' (Sample Scout)";
   return reply;
 }

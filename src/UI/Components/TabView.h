@@ -9,6 +9,7 @@
 #include "PianoRollMini.h"
 #include "DrumGrid.h"
 #include "DragHandle.h"
+#include "SampleBrowser.h"
 
 namespace MidiForge {
 
@@ -43,6 +44,7 @@ public:
 private:
   juce::TabbedComponent tabs{juce::TabbedButtonBar::TabsAtTop};
   std::vector<std::unique_ptr<TrackPage>> pages;
+  std::unique_ptr<SampleBrowser> samplePage;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TabView)
 };

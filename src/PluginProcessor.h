@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "Core/Types.h"
+#include "Samples/SampleLibrary.h"
 
 namespace MidiForge {
 
@@ -35,10 +36,12 @@ public:
   SessionIdea& getCurrentIdea() { return currentIdea; }
   void generateFull();
   void regenerateTrack(const juce::String& name);
+  SampleLibrary& getSampleLibrary() { return sampleLibrary; }
 
 private:
   SessionIdea currentIdea;
   int regenCounter{0};
+  SampleLibrary sampleLibrary;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiForgeAudioProcessor)
 };
 

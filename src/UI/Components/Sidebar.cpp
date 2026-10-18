@@ -1,17 +1,65 @@
 #include "Sidebar.h"
 #include "../LookAndFeel.h"
+#include "../../Content/Characters.h"
 
 namespace MidiForge {
 
 Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("history", this) {
-  (void)processor;
   titleLabel.setText("Ideas", juce::dontSendNotification);
   titleLabel.setFont(juce::Font(juce::FontOptions(15.0f, juce::Font::bold)));
   titleLabel.setColour(juce::Label::textColourId, Palette::textPrimary);
   addAndMakeVisible(titleLabel);
 
+  charLabel.setText("Caracter", juce::dontSendNotification);
+  charLabel.setFont(juce::Font(juce::FontOptions(11.0f)));
+  charLabel.setColour(juce::Label::textColourId, Palette::textSecondary);
+  addAndMakeVisible(charLabel);
+
+  charBox.addItem("None", 1);
+  charBox.addItem("Detroit", 2);
+  charBox.addItem("Trap Oscuro", 3);
+  charBox.addItem("Plugg", 4);
+  charBox.addItem("Nu-Jerk", 5);
+  charBox.addItem("Boom Bap", 6);
+  charBox.setSelectedId(1, juce::dontSendNotification);
+  charBox.onChange = [this] {
+    Character ch = Character::None;
+    switch (charBox.getSelectedId()) {
+      case 2: ch = Character::Detroit; break;
+      case 3: ch = Character::TrapDark; break;
+      case 4: ch = Character::Plugg; break;
+      case 5: ch = Character::NuJerk; break;
+      case 6: ch = Character::BoomBap; break;
+      default: ch = Character::None; break;
+    }
+    auto& idea = processor.getCurrentIdea();
+    idea.character = ch;
+    if (ch != Character::None) {
+      idea.style = Style::HipHop;
+      const auto cp = Content::characterPresetOf(ch);
+      if (cp.valid) idea.swing = cp.swing;
+    }
+    processor.generateFull();
+    if (onIdeaChanged) onIdeaChanged();
+  };
+  addAndMakeVisible(charBox);
+
   addAndMakeVisible(historyList);
   history.add("Idea 001");
+}
+
+void Sidebar::refreshFromIdea() {
+  int id = 1;
+  switch (processor.getCurrentIdea().character) {
+    case Character::Detroit: id = 2; break;
+    case Character::TrapDark: id = 3; break;
+    case Character::Plugg: id = 4; break;
+    case Character::NuJerk: id = 5; break;
+    case Character::BoomBap: id = 6; break;
+    case Character::None: id = 1; break;
+  }
+  if (charBox.getSelectedId() != id)
+    charBox.setSelectedId(id, juce::dontSendNotification);
 }
 
 int Sidebar::getNumRows() { return history.size(); }
@@ -33,6 +81,9 @@ void Sidebar::resized() {
   auto r = getLocalBounds().reduced(10, 10);
   titleLabel.setBounds(r.removeFromTop(26));
   r.removeFromTop(6);
+  charLabel.setBounds(r.removeFromTop(14));
+  charBox.setBounds(r.removeFromTop(24));
+  r.removeFromTop(8);
   historyList.setBounds(r);
 }
 

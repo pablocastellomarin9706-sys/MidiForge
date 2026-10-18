@@ -39,8 +39,22 @@ void MidiForgeAudioProcessor::setCurrentProgram(int) {}
 const juce::String MidiForgeAudioProcessor::getProgramName(int) { return "Default"; }
 void MidiForgeAudioProcessor::changeProgramName(int, const juce::String&) {}
 
-void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock&) {}
-void MidiForgeAudioProcessor::setStateInformation(const void*, int) {}
+void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
+  juce::XmlElement xml("MidiForgeState");
+  xml.setAttribute("folders", sampleLibrary.getFolders().joinIntoString("\n"));
+  copyXmlToBinary(xml, destData);
+}
+
+void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBytes) {
+  auto xml = getXmlFromBinary(data, sizeInBytes);
+  if (xml == nullptr) return;
+
+  juce::StringArray folders =
+      juce::StringArray::fromLines(xml->getStringAttribute("folders", ""));
+  if (folders.isEmpty())
+    folders.add(juce::File::getSpecialLocation(juce::File::userMusicDirectory).getFullPathName());
+  sampleLibrary.setFolders(folders);
+}
 
 void MidiForgeAudioProcessor::generateFull() {
   IdeaGenerator gen;

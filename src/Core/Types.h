@@ -47,6 +47,28 @@ inline juce::String styleName(Style s) {
   return "Pop";
 }
 
+// Sub-genre character inside the HipHop family (Detroit/plugg/jerk/...).
+enum class Character {
+  None,
+  Detroit,
+  TrapDark,
+  Plugg,
+  NuJerk,
+  BoomBap
+};
+
+inline juce::String characterName(Character c) {
+  switch (c) {
+    case Character::None: return "None";
+    case Character::Detroit: return "Detroit";
+    case Character::TrapDark: return "Trap Oscuro";
+    case Character::Plugg: return "Plugg";
+    case Character::NuJerk: return "Nu-Jerk";
+    case Character::BoomBap: return "Boom Bap";
+  }
+  return "None";
+}
+
 struct Note {
   int pitch;      // MIDI note 0-127
   double start;   // beats
@@ -79,6 +101,7 @@ struct SessionIdea {
   int keyRoot{0}; // 0-11 C..B
   ScaleType scale{ScaleType::Major};
   Style style{Style::Pop};
+  Character character{Character::None};
   double swing{0.0}; // 0-100%
   double strum{0.0}; // beats offset 0-0.25
   int strumDir{0};   // 0 up, 1 down, 2 random

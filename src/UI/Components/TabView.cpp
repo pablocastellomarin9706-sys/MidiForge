@@ -65,6 +65,9 @@ TabView::TabView(MidiForgeAudioProcessor& p) : tabs(juce::TabbedButtonBar::TabsA
   makePage("Melody", 1);
   makePage("Bass", 1);
   makePage("Drums", 2);
+
+  samplePage = std::make_unique<SampleBrowser>(p);
+  tabs.addTab("SAMPLES", Palette::panel, samplePage.get(), false);
 }
 
 void TabView::refreshAll() {

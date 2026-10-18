@@ -10,13 +10,18 @@ public:
   explicit Sidebar(MidiForgeAudioProcessor& p);
   void paint(juce::Graphics&) override;
   void resized() override;
+  void refreshFromIdea();
 
   int getNumRows() override;
   void paintListBoxItem(int rowNumber, juce::Graphics&, int width, int height, bool rowIsSelected) override;
 
+  std::function<void()> onIdeaChanged;
+
 private:
   MidiForgeAudioProcessor& processor;
   juce::Label titleLabel;
+  juce::Label charLabel;
+  juce::ComboBox charBox;
   juce::ListBox historyList;
   juce::StringArray history;
 
