@@ -64,10 +64,13 @@ new age de cassette con pocas reproducciones frente a fuentes comerciales.
 - [x] Escala por defecto del personaje (`defaultScaleFor`): familia menor al pasar
       desde Mayor (Detroit/TrapDark/Plugg/NuJerk/Rage -> menor natural; TrapLatino
       -> menor armonica).
-- [ ] 6/8 y tresillos (Servida). Ver `REFERENCIAS_YOUTUBE.md`.
+- [ ] 6/8 y tresillos (Servida). Ver `REFERENCIAS_YOUTUBE.md` (requiere apartado
+      propio de motor: rejilla, time signature y UI; decidido no a medias).
 - [ ] BoomBap: +sincopa de chop (base swing 22% ya implementada; menos prioritario).
 - [x] Character base (Detroit / Trap Oscuro / Plugg / Nu-Jerk / Boom Bap)
       implementado en la Fase 4.
+- [x] Detroit (Insulation): melodia con capa una octava abajo + retroprogresion
+      por compas con hueco tras el downbeat (`melodyOctaveDown` / `melodyReverse`).
 
 Detalle de fuentes y medidas: `REFERENCIAS_YOUTUBE.md`.
 

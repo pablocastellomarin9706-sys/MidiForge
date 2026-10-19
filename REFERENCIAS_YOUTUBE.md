@@ -69,13 +69,22 @@ material de analisis; aqui solo lo que cambia el plugin.)
 
 ## 4. Pendiente (siguientes pasos)
 
-- [ ] **6/8** (Servida): soportar compas 6/8 (o 3/4) y rejilla 1/3-1/6.
-- [ ] **Tresillos / shuffle** explicitos (R&B 105 BPM).
-- [ ] Melodia **doblada una octava abajo** como opcion (Detroit).
-- [ ] "Reversa + hueco" como recurso de motivo (Detroit / Silencio).
-- [ ] Ajuste de **tuning** del 808 (-4 semitonos) como parametro de textura,
-      no de armonia (no forzar la raiz).
-- [ ] Groove "deep-fried" (flatness alta) como preset de saturacion del sample.
+- [x] **Melodia doblada una octava abajo** (Detroit): `characterPresetOf(Detroit).melodyOctaveDown`,
+      capa suave anadida en `applyCharacterToTrack` (IdeaGenerator.cpp). Hecho 2026-10-19.
+- [x] **"Reversa + hueco"** (Detroit): `melodyReverse` 0.45 — retroprogresion del orden de
+      alturas por compas (conservando la rejilla ritmica) + hueco tras el downbeat.
+      Hecho 2026-10-19.
+- [ ] **6/8** (Servida): soportar compas 6/8 (o 3/4) y rejilla 1/3-1/6. DECISION 2026-10-19:
+      requiere tocar todos los generadores, MidiBuilder (meta 4/4) y las reticulas de la UI
+      (16 pasos/compas); se hace como apartado propio, no a medias.
+- [ ] **Tresillos / shuffle** explicitos (R&B 105 BPM): depende del 6/8 (rejilla 1/3).
+- [ ] **Tuning del 808 (-4 semitonos)**: nota de dominio — es un ajuste del SAMPLE
+      (root note del sampler en FL replacing: sampler/Root note), no es transcribible a
+      MIDI sin romper la armonia. En el flujo real: abrir el 808 en FL y poner Root note
+      del sample para compensar. Cerrado como apartado que no vive en el plugin MIDI.
+- [ ] **Groove "deep-fried"** (flatness alta): lo mismo — es saturacion/dialumento del
+      sample (soft-clipping + tuning), no prosodica MIDI. Se sugiere en el sonido
+      sugerido de las entregas, no en el generador.
 - [ ] Revisar que el fallback de progresiones por familia no introduzca el V
       mayor bajo melodia de menor natural de forma molesta (hoy es intencional).
 

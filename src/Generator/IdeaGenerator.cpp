@@ -67,6 +67,47 @@ static void applyCharacterToTrack(SessionIdea& idea, TrackIdea& t, RandomGen& rn
     t.notes.swap(kept);
   }
 
+  // Detroit "reverse + gap": per-bar retrograde of the pitch order plus a rest
+  // right after the downbeat. Silence is part of the phrase (Insulation).
+  if (isMelody && P.melodyReverse > 0.0) {
+    const int bars = idea.bars > 0 ? idea.bars : 4;
+    for (int bar = 0; bar < bars; ++bar) {
+      if (rng.nextDouble() >= P.melodyReverse) continue;
+      const double b0 = (double)bar * 4.0;
+      const double b1 = b0 + 4.0;
+      std::vector<std::size_t> ids;
+      for (std::size_t i = 0; i < t.notes.size(); ++i)
+        if (t.notes[i].start >= b0 && t.notes[i].start < b1) ids.push_back(i);
+      if (ids.size() < 4) continue;
+
+      // Retrograde: keep the rhythm grid, flip the pitch order.
+      std::vector<int> pitches;
+      pitches.reserve(ids.size());
+      for (auto i : ids) pitches.push_back(t.notes[i].pitch);
+      for (std::size_t k = 0; k < ids.size(); ++k)
+        t.notes[ids[k]].pitch = pitches[ids.size() - 1 - k];
+
+      // Gap: mute the note right after the downbeat (leave >= 3 notes).
+      t.notes.erase(t.notes.begin() + (std::ptrdiff_t)ids[1]);
+    }
+  }
+
+  // Detroit "doubling": a soft copy of the melody an octave below thickens the
+  // line (see Insulation reference: melodias dobladas). Stays clear of the 808.
+  if (isMelody && P.melodyOctaveDown && !t.notes.empty()) {
+    std::vector<Note> layer;
+    layer.reserve(t.notes.size());
+    for (const auto& n : t.notes) {
+      const int p = n.pitch - 12;
+      if (p < 24) continue;
+      Note d = n;
+      d.pitch = p;
+      d.velocity = juce::jlimit(1, 127, juce::roundToInt((double)n.velocity * 0.72));
+      layer.push_back(d);
+    }
+    t.notes.insert(t.notes.end(), layer.begin(), layer.end());
+  }
+
   if (isDrums && P.ghostProb > 0.0) {
     const int bars = idea.bars > 0 ? idea.bars : 4;
     for (int bar = 0; bar < bars; ++bar) {

@@ -22,12 +22,14 @@ struct CharacterPreset {
   int octaveShift{0};      // Melody-only octave bias
   double bassLenScale{1.0};// Bass only: > 1 overlaps the next 808 (glide)
   double density{1.0};     // Melody: 1.0 keeps all notes, lower = more air
+  bool melodyOctaveDown{false}; // Melody: add a soft copy an octave below (thickening)
+  double melodyReverse{0.0};    // Melody: per-bar retrograde + rest gap probability
 };
 
 inline CharacterPreset characterPresetOf(Character c) {
   switch (c) {
-    //                 valid  swing jitter  vel  len  ghost oct  bass  dens
-    case Character::Detroit:    return {true, 10.0, 0.018, 6, 1.00, 0.25,  0, 1.40, 1.00};
+    //                 valid  swing jitter  vel  len  ghost oct  bass  dens  octDown revGap
+    case Character::Detroit:    return {true, 10.0, 0.018, 6, 1.00, 0.25,  0, 1.40, 1.00, true, 0.45};
     case Character::TrapDark:   return {true,  3.0, 0.010, 5, 0.72, 0.35,  0, 1.50, 1.00};
     case Character::Plugg:      return {true,  9.0, 0.015, 4, 1.20, 0.08,  1, 1.60, 0.75};
     case Character::NuJerk:     return {true,  6.0, 0.012, 5, 0.65, 0.20,  0, 1.20, 0.85};
