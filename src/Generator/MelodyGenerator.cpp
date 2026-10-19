@@ -29,6 +29,7 @@ void MelodyGenerator::generate(SessionIdea& idea, RandomGen& rng) {
   const auto& motifs = Content::allMotifs();
   if (motifs.empty()) return;
   if (idea.melodyMotifIdx < 0) idea.melodyMotifIdx = 0;
+  if (idea.melodyMotifIdx >= (int)motifs.size()) idea.melodyMotifIdx %= (int)motifs.size();
 
   TrackIdea t;
   t.name = "Melody";
@@ -50,7 +51,10 @@ void MelodyGenerator::generate(SessionIdea& idea, RandomGen& rng) {
 
       deg += stepChoices[rng.nextInt(0, 7)];
       deg = ((deg % n) + n) % n;
-      int pitch = 60 + idea.keyRoot + scalePcs[(size_t)deg];
+      // getScale already folds keyRoot into these pitch classes; adding it
+      // again transposed every non-C key (X-1, the whole melody). 60 + pc keeps
+      // the lead centred at C5 (FL's midi 60 = C5) for any key.
+      int pitch = 60 + scalePcs[(size_t)deg];
 
       bool phraseStart = (off == 0.0);
       bool lastNote = (bar == bars - 1 && ni == motif.notes.size() - 1);

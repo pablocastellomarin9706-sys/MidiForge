@@ -9,6 +9,8 @@ class IdeaGenerator {
 public:
   void generateFull(SessionIdea& idea);
   void regenerateTrack(SessionIdea& idea, const juce::String& trackName, int seedOffset=0);
+  // Rebuilds a restored (persisted) idea from its seed/take/curated picks.
+  void generateFromSaved(SessionIdea& idea);
 
   // "Variacion" knob: deterministic extra humanisation layered on top of a
   // finished idea (velocity variance, micro-timing, octave sparkle).

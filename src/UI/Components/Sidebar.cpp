@@ -50,13 +50,49 @@ Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("histor
   };
   addAndMakeVisible(charBox);
 
+  historyLabel.setText("Historial (clic restaura)", juce::dontSendNotification);
+  historyLabel.setFont(juce::Font(juce::FontOptions(11.0f)));
+  historyLabel.setColour(juce::Label::textColourId, Palette::textSecondary);
+
+  historyList.setColour(juce::ListBox::outlineColourId, Palette::border);
+  addAndMakeVisible(historyLabel);
   addAndMakeVisible(historyList);
-  history.add("Idea 001");
+
+  // Sync with the idea that existed before the editor opened (restored state).
+  refreshFromIdea();
+}
+
+void Sidebar::restoreHistoryRow(int row) {
+  if (row < 0 || row >= (int)historyParams.size()) return;
+  const auto& e = historyParams[(size_t)row];
+  auto& idea = processor.getCurrentIdea();
+  if (idea.seed == e.seed && idea.take == e.take && idea.character == e.character) return;
+
+  restoringHistory = true;
+  idea.seed = e.seed;
+  idea.take = e.take;
+  idea.character = e.character;
+  idea.bars = e.bars;
+  idea.keyRoot = e.keyRoot;
+  idea.scale = e.scale;
+  idea.style = e.style;
+  idea.swing = e.swing;
+  idea.brightness = e.brightness;
+  idea.creativity = e.creativity;
+  processor.generateFull();
+  // Record the restored state without adding a new history row.
+  refreshFromIdea();
+  if (onIdeaChanged) onIdeaChanged();
+}
+
+void Sidebar::listBoxItemClicked(int row, const juce::MouseEvent&) {
+  restoreHistoryRow(row);
 }
 
 void Sidebar::refreshFromIdea() {
   int id = 1;
-  switch (processor.getCurrentIdea().character) {
+  const auto& idea = processor.getCurrentIdea();
+  switch (idea.character) {
     case Character::Detroit: id = 2; break;
     case Character::TrapDark: id = 3; break;
     case Character::Plugg: id = 4; break;
@@ -68,6 +104,25 @@ void Sidebar::refreshFromIdea() {
   }
   if (charBox.getSelectedId() != id)
     charBox.setSelectedId(id, juce::dontSendNotification);
+
+  if (!restoringHistory) {
+    const bool dup = !historyParams.empty() &&
+        historyParams.back().seed == idea.seed &&
+        historyParams.back().take == idea.take &&
+        historyParams.back().character == idea.character;
+    if (!dup) {
+      historyParams.push_back({idea.seed, idea.take, idea.character,
+                               idea.bars, idea.keyRoot, idea.scale, idea.style,
+                               idea.swing, idea.brightness, idea.creativity});
+      ++historyCounter;
+      history.add(juce::String::formatted("Idea %03d", historyCounter));
+      historyList.updateContent();
+      // Keep the newest idea visible (selectRow scrolls when needed); the
+      // highlight doubles as the "this is what you have now" marker.
+      historyList.selectRow((int)historyParams.size() - 1, true);
+    }
+  }
+  restoringHistory = false;
 }
 
 int Sidebar::getNumRows() { return history.size(); }
@@ -112,6 +167,8 @@ void Sidebar::resized() {
   charLabel.setBounds(r.removeFromTop(14));
   charBox.setBounds(r.removeFromTop(24));
   r.removeFromTop(8);
+  historyLabel.setBounds(r.removeFromTop(16));
+  r.removeFromTop(4);
   historyList.setBounds(r);
 }
 

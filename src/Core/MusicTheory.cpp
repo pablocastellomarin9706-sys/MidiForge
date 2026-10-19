@@ -64,13 +64,31 @@ int degreeToSemitone(ScaleType scale, int degree) {
   if (degree > 7) degree = 7;
   static const int major[7] = {0,2,4,5,7,9,11};
   static const int minorNat[7] = {0,2,3,5,7,8,10};
-  if (scale == ScaleType::MinorNatural || scale == ScaleType::MinorHarmonic ||
-      scale == ScaleType::MinorMelodic || scale == ScaleType::Aeolian ||
-      scale == ScaleType::Dorian || scale == ScaleType::Phrygian ||
-      scale == ScaleType::Locrian) {
-    return minorNat[degree - 1];
+  static const int minorHarm[7] = {0,2,3,5,7,8,11};
+  static const int minorMeld[7] = {0,2,3,5,7,9,11};
+  static const int dor[7] = {0,2,3,5,7,9,10};
+  static const int phr[7] = {0,1,3,5,7,8,10};
+  static const int lyd[7] = {0,2,4,6,7,9,11};
+  static const int mixo[7] = {0,2,4,5,7,9,10};
+  static const int locr[7] = {0,1,3,5,6,8,10};
+  switch (scale) {
+    case ScaleType::MinorNatural:
+    case ScaleType::Aeolian:      return minorNat[degree - 1];
+    case ScaleType::MinorHarmonic: return minorHarm[degree - 1];
+    case ScaleType::MinorMelodic:  return minorMeld[degree - 1];
+    case ScaleType::Dorian:        return dor[degree - 1];
+    case ScaleType::Phrygian:      return phr[degree - 1];
+    case ScaleType::Lydian:        return lyd[degree - 1];
+    case ScaleType::Mixolydian:    return mixo[degree - 1];
+    case ScaleType::Locrian:       return locr[degree - 1];
+    // Degree semantics fall back to the closest diatonic table.
+    case ScaleType::PentatonicMinor:
+    case ScaleType::Blues:
+    case ScaleType::Chromatic:     return minorNat[degree - 1];
+    case ScaleType::Major:
+    case ScaleType::PentatonicMajor:
+    default:                       return major[degree - 1];
   }
-  return major[degree - 1];
 }
 
 static bool containsInt(const std::vector<int>& v, int x) {

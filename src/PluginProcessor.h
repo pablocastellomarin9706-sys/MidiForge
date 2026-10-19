@@ -47,12 +47,17 @@ public:
   // Sample audition: previews a file through the plugin's audio output.
   bool previewSample(const juce::File& file);
   void stopPreview();
+  void stopPreviewLocked(); // requires previewLock to be held
   bool isPreviewing() const { return previewing.load(); }
 
 private:
   SessionIdea currentIdea;
   int regenCounter{0};
   SampleLibrary sampleLibrary;
+
+  // Guards the preview transport: processBlock pulls from it on the audio
+  // thread while previewSample/stopPreview rewire it on the message thread.
+  juce::SpinLock previewLock;
 
   std::atomic<double> hostBpm{0.0};
 

@@ -6,7 +6,7 @@ namespace MidiForge {
 
 class RandomGen {
 public:
-  explicit RandomGen(int seed) : rng(seed) {}
+  explicit RandomGen(int seed) : seedVal(seed), rng(seed) {}
   int nextInt(int min, int max) {
     if(max <= min) return min;
     return rng.nextInt(max - min + 1) + min;

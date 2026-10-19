@@ -186,6 +186,35 @@ void IdeaGenerator::generateFull(SessionIdea& idea) {
   restoreFlags(idea.tracks, oldTracks);
 }
 
+// Rebuild a saved idea (restored by setStateInformation): keeps the persisted
+// curated picks, re-derives the same rng stream and replays the generators.
+// Falls back to a fresh pickAll if a persisted catalog index went stale.
+void IdeaGenerator::generateFromSaved(SessionIdea& idea) {
+  RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
+
+  bool idsOk = true;
+  if (idea.progressionIdx < 0 || idea.progressionIdx >= (int)Content::allProgressions().size())
+    idsOk = false;
+  if (idea.drumPatternIdx < 0 || idea.drumPatternIdx >= (int)Content::allDrumPatterns().size())
+    idsOk = false;
+  if (idea.bassPatternIdx < 0 || idea.bassPatternIdx >= (int)Content::allBassPatterns().size())
+    idsOk = false;
+
+  idea.tracks.clear(); // idempotent: hosts may call setStateInformation twice
+  if (!idsOk) {
+    pickAll(idea, rng);
+  } else {
+    const auto& prog = Content::allProgressions()[(size_t)idea.progressionIdx];
+    idea.progressionDisplay = prog.display;
+    idea.progressionName = prog.name;
+    idea.drumPatternName = Content::allDrumPatterns()[(size_t)idea.drumPatternIdx].name;
+    idea.bassPatternName = Content::allBassPatterns()[(size_t)idea.bassPatternIdx].name;
+  }
+
+  runAll(idea, rng);
+  applyCharacterPost(idea, rng);
+}
+
 void IdeaGenerator::clearTrack(SessionIdea& idea, const juce::String& name) {
   for (auto it = idea.tracks.begin(); it != idea.tracks.end(); ) {
     if (it->name == name) it = idea.tracks.erase(it);
@@ -207,8 +236,15 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     idea.progressionDisplay = P.display;
     idea.progressionName = P.name;
     ChordGenerator cg; cg.generate(idea, rng);
-    // Bass follows chord roots, so refresh it to stay in key.
+    // Bass follows chord roots, so refresh it to stay in key. Also re-pick the
+    // 808/pattern if the persisted one belongs to another style or character.
     clearTrack(idea, "Bass");
+    auto bass = Content::bassIndicesFor(idea.style, idea.character);
+    if (!bass.empty() && (idea.bassPatternIdx < 0 ||
+                          std::find(bass.begin(), bass.end(), idea.bassPatternIdx) == bass.end())) {
+      idea.bassPatternIdx = bass[(size_t)rng.nextInt(0, (int)bass.size() - 1)];
+      idea.bassPatternName = Content::allBassPatterns()[(size_t)idea.bassPatternIdx].name;
+    }
     BassGenerator bg; bg.generate(idea, rng);
   } else if (trackName == "Melody") {
     int n = (int)Content::allMotifs().size();
