@@ -58,10 +58,18 @@ new age de cassette con pocas reproducciones frente a fuentes comerciales.
       densidad 0.9, menor armonica por defecto (desde Mayor).
 - [x] Rage: swing 2%, velSigma 9, notas cortas (0.70), 808 glides 1.5, densidad 0.85.
 - [x] Plugg v2: swing 9%, bajo legato (1.6), densidad 0.75 (aire), +1 octava.
-- [x] Nu-Jerk v2 (Fakemink): relajado (swing 4%, len 0.75, ghosts 0.18, densidad 0.80).
+- [x] Nu-Jerk v2 (Fakemink): relajado (swing 6%, len 0.65 staccato, ghosts 0.20, 808 glide 1.2, densidad 0.85).
+- [x] Contenido por `Character` (2 patrones de bateria + 2 de 808 + 2 progresiones
+      propias por personaje); antes Detroit/jerk/plugg compartian los genericos.
+- [x] Escala por defecto del personaje (`defaultScaleFor`): familia menor al pasar
+      desde Mayor (Detroit/TrapDark/Plugg/NuJerk/Rage -> menor natural; TrapLatino
+      -> menor armonica).
+- [ ] 6/8 y tresillos (Servida). Ver `REFERENCIAS_YOUTUBE.md`.
 - [ ] BoomBap: +sincopa de chop (base swing 22% ya implementada; menos prioritario).
 - [x] Character base (Detroit / Trap Oscuro / Plugg / Nu-Jerk / Boom Bap)
       implementado en la Fase 4.
+
+Detalle de fuentes y medidas: `REFERENCIAS_YOUTUBE.md`.
 
 Nota: los tempos son orientativos (FL Studio es dueno del tempo). El plugin
 solo fija el "feel" (swing, jitter, longitudes) y el contenido (notas).

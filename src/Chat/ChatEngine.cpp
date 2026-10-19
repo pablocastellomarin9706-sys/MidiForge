@@ -450,9 +450,9 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
         idea.style = Style::HipHop;
         const auto cp = Content::characterPresetOf(ch);
         if (cp.valid) idea.swing = cp.swing;
-        // Latin trap leans on harmonic minor colours by default.
-        if (ch == Character::TrapLatino && idea.scale == ScaleType::Major)
-          idea.scale = ScaleType::MinorHarmonic;
+        // Minor-family characters snap Major to their home mode.
+        if (idea.scale == ScaleType::Major)
+          idea.scale = Content::defaultScaleFor(ch);
       }
     }
 

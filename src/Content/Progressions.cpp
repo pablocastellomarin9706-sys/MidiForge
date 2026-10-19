@@ -54,22 +54,62 @@ const std::vector<Progression>& allProgressions() {
       {slot(1), slot(7, -1, "maj"), slot(4), slot(1)}},
     {"Rock Minor Grind", "i - bVII - bVI - bVII", Style::Rock, ScaleType::MinorNatural,
       {slot(1), slot(7, -1, "maj"), slot(6, -1, "maj"), slot(7, -1, "maj")}},
+    // ---- Character-specific (HipHop family) ----
+    // Detroit: minor with a bright major V (harmonic-minor colour).
+    {"Detroit Minor", "i - VI - iv - V", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(6), slot(4), slot(5, 0, "maj")}, Character::Detroit},
+    {"Detroit Dark", "i - VII - VI - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(7), slot(6), slot(7)}, Character::Detroit},
+    // Nu-Jerk: droning, repetitive, hazy.
+    {"Jerk Drone", "i - i - VI - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(1), slot(6), slot(7)}, Character::NuJerk},
+    {"Jerk Haze", "i - v - VI - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(5), slot(6), slot(7)}, Character::NuJerk},
+    // Trap Oscuro.
+    {"Dark Trap", "i - VI - VII - v", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(6), slot(7), slot(5)}, Character::TrapDark},
+    {"Trap Noir", "i - VII - VI - v", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(7), slot(6), slot(5)}, Character::TrapDark},
+    // Plugg: airy Pi'erre-style motion.
+    {"Plugg Space", "i - v - VI - iv", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(5), slot(6), slot(4)}, Character::Plugg},
+    {"Plugg Float", "i - III - VI - iv", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(3), slot(6), slot(4)}, Character::Plugg},
+    // Rage.
+    {"Rage Lift", "i - VI - III - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(6), slot(3), slot(7)}, Character::Rage},
+    {"Rage Charge", "i - VII - VI - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(7), slot(6), slot(7)}, Character::Rage},
+    // Trap Latino: major V + dembow-friendly loop.
+    {"Latino Minor", "i - VII - VI - V", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(7), slot(6), slot(5, 0, "maj")}, Character::TrapLatino},
+    {"Latino Dembow", "i - iv - VII - i", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1), slot(4), slot(7), slot(1)}, Character::TrapLatino},
   };
   return progs;
 }
 
-std::vector<int> progressionIndicesFor(Style style, ScaleType chordScale) {
+std::vector<int> progressionIndicesFor(Style style, ScaleType chordScale, Character character) {
   const auto& progs = allProgressions();
   std::vector<int> out;
-  for (size_t i = 0; i < progs.size(); ++i) {
-    if (progs[i].style == style && progs[i].scale == chordScale) out.push_back((int)i);
+  // 1) Dedicated progressions for this character in this style + scale.
+  if (character != Character::None) {
+    for (size_t i = 0; i < progs.size(); ++i)
+      if (progs[i].style == style && progs[i].scale == chordScale &&
+          progs[i].character == character) out.push_back((int)i);
+    if (!out.empty()) return out;
   }
+  // 2) Generic progressions of this style + scale.
+  for (size_t i = 0; i < progs.size(); ++i)
+    if (progs[i].style == style && progs[i].scale == chordScale &&
+        progs[i].character == Character::None) out.push_back((int)i);
   if (!out.empty()) return out;
-  // Fallback: same scale family, any style.
-  for (size_t i = 0; i < progs.size(); ++i) {
-    if (progs[i].scale == chordScale) out.push_back((int)i);
-  }
+  // 3) Fallback: same scale family, any style.
+  const bool minor = MusicTheory::isMinorFamily(chordScale);
+  for (size_t i = 0; i < progs.size(); ++i)
+    if (MusicTheory::isMinorFamily(progs[i].scale) == minor) out.push_back((int)i);
   if (!out.empty()) return out;
+  // 4) Anything.
   for (size_t i = 0; i < progs.size(); ++i) out.push_back((int)i);
   return out;
 }

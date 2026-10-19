@@ -42,8 +42,8 @@ Sidebar::Sidebar(MidiForgeAudioProcessor& p) : processor(p), historyList("histor
       idea.style = Style::HipHop;
       const auto cp = Content::characterPresetOf(ch);
       if (cp.valid) idea.swing = cp.swing;
-      if (ch == Character::TrapLatino && idea.scale == ScaleType::Major)
-        idea.scale = ScaleType::MinorHarmonic;
+      if (idea.scale == ScaleType::Major)
+        idea.scale = Content::defaultScaleFor(ch);
     }
     processor.generateFull();
     if (onIdeaChanged) onIdeaChanged();

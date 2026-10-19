@@ -18,6 +18,7 @@ struct Progression {
   Style style{Style::Pop};
   ScaleType scale{ScaleType::Major};
   std::vector<ChordSlot> chords; // one slot per bar (loops if idea has more bars)
+  Character character{Character::None}; // None = generic, fits any character
 };
 
 struct RealizedChord {
@@ -32,8 +33,10 @@ struct RealizedChord {
 const std::vector<Progression>& allProgressions();
 
 // Indices of progressions that fit a style + chord-scale family.
-// Falls back to any progression of the matching scale family.
-std::vector<int> progressionIndicesFor(Style style, ScaleType chordScale);
+// When a character is active its dedicated progressions are preferred,
+// falling back to generic style matches and then to the scale family.
+std::vector<int> progressionIndicesFor(Style style, ScaleType chordScale,
+                                       Character character = Character::None);
 
 // Resolve a progression into concrete voiced chords for an idea.
 // Loops/truncates the slot list to cover idea.bars.

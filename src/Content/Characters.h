@@ -27,16 +27,32 @@ struct CharacterPreset {
 inline CharacterPreset characterPresetOf(Character c) {
   switch (c) {
     //                 valid  swing jitter  vel  len  ghost oct  bass  dens
-    case Character::Detroit:    return {true, 12.0, 0.020, 6, 1.00, 0.25,  0, 1.40, 1.00};
-    case Character::TrapDark:   return {true,  3.0, 0.010, 5, 0.75, 0.35,  0, 1.50, 1.00};
+    case Character::Detroit:    return {true, 10.0, 0.018, 6, 1.00, 0.25,  0, 1.40, 1.00};
+    case Character::TrapDark:   return {true,  3.0, 0.010, 5, 0.72, 0.35,  0, 1.50, 1.00};
     case Character::Plugg:      return {true,  9.0, 0.015, 4, 1.20, 0.08,  1, 1.60, 0.75};
-    case Character::NuJerk:     return {true,  4.0, 0.010, 5, 0.75, 0.18,  0, 1.00, 0.80};
+    case Character::NuJerk:     return {true,  6.0, 0.012, 5, 0.65, 0.20,  0, 1.20, 0.85};
     case Character::BoomBap:    return {true, 22.0, 0.045, 8, 1.10, 0.40, -1, 1.00, 1.00};
     case Character::Rage:       return {true,  2.0, 0.006, 9, 0.70, 0.25,  0, 1.50, 0.85};
     case Character::TrapLatino: return {true,  5.0, 0.012, 6, 0.90, 0.45,  0, 1.70, 0.90};
     case Character::None:       break;
   }
   return {};
+}
+
+// Scale a character leans on when the user has not forced a key colour.
+// The minor-family characters sound wrong over a major scale, so when the
+// idea is Major we snap it to the character's home mode.
+inline ScaleType defaultScaleFor(Character c) {
+  switch (c) {
+    case Character::TrapLatino: return ScaleType::MinorHarmonic;
+    case Character::Detroit:
+    case Character::TrapDark:
+    case Character::Plugg:
+    case Character::NuJerk:
+    case Character::Rage:       return ScaleType::MinorNatural;
+    case Character::None:       break;
+  }
+  return ScaleType::Major;
 }
 
 } // namespace Content

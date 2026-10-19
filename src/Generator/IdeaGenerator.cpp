@@ -98,17 +98,17 @@ static void applyCharacterPost(SessionIdea& idea, RandomGen& rng) {
 void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
   ScaleType fam = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural : ScaleType::Major;
 
-  auto progs = Content::progressionIndicesFor(idea.style, fam);
+  auto progs = Content::progressionIndicesFor(idea.style, fam, idea.character);
   idea.progressionIdx = progs[(size_t)rng.nextInt(0, (int)progs.size() - 1)];
   const auto& P = Content::allProgressions()[(size_t)idea.progressionIdx];
   idea.progressionDisplay = P.display;
   idea.progressionName = P.name;
 
-  auto drums = Content::drumIndicesFor(idea.style);
+  auto drums = Content::drumIndicesFor(idea.style, idea.character);
   idea.drumPatternIdx = drums[(size_t)rng.nextInt(0, (int)drums.size() - 1)];
   idea.drumPatternName = Content::allDrumPatterns()[(size_t)idea.drumPatternIdx].name;
 
-  auto bass = Content::bassIndicesFor(idea.style);
+  auto bass = Content::bassIndicesFor(idea.style, idea.character);
   idea.bassPatternIdx = bass[(size_t)rng.nextInt(0, (int)bass.size() - 1)];
   idea.bassPatternName = Content::allBassPatterns()[(size_t)idea.bassPatternIdx].name;
 
@@ -160,7 +160,7 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
   ScaleType fam = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural : ScaleType::Major;
 
   if (trackName == "Chords") {
-    auto progs = Content::progressionIndicesFor(idea.style, fam);
+    auto progs = Content::progressionIndicesFor(idea.style, fam, idea.character);
     idea.progressionIdx = pickDifferent(progs, idea.progressionIdx, rng);
     const auto& P = Content::allProgressions()[(size_t)idea.progressionIdx];
     idea.progressionDisplay = P.display;
@@ -176,12 +176,12 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     idea.melodyMotifIdx = pick;
     MelodyGenerator mg; mg.generate(idea, rng);
   } else if (trackName == "Bass") {
-    auto bass = Content::bassIndicesFor(idea.style);
+    auto bass = Content::bassIndicesFor(idea.style, idea.character);
     idea.bassPatternIdx = pickDifferent(bass, idea.bassPatternIdx, rng);
     idea.bassPatternName = Content::allBassPatterns()[(size_t)idea.bassPatternIdx].name;
     BassGenerator bg; bg.generate(idea, rng);
   } else if (trackName == "Drums") {
-    auto drums = Content::drumIndicesFor(idea.style);
+    auto drums = Content::drumIndicesFor(idea.style, idea.character);
     idea.drumPatternIdx = pickDifferent(drums, idea.drumPatternIdx, rng);
     idea.drumPatternName = Content::allDrumPatterns()[(size_t)idea.drumPatternIdx].name;
     DrumGenerator dg; dg.generate(idea, rng);
