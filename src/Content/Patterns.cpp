@@ -122,6 +122,24 @@ const std::vector<DrumPattern>& allDrumPatterns() {
       dh(3,kSnare,108), dh(7,kSnare,106), dh(11,kSnare,108), dh(15,kSnare,106),
       dh(0,kHat,80), dh(2,kHat,74), dh(4,kHat,82), dh(6,kHat,76),
       dh(8,kHat,82), dh(10,kHat,76), dh(12,kHat,84), dh(14,kHat,78)}, Character::TrapLatino},
+    // ---- Delivered sets (v1.0): patterns taken from the JERK / PLUGG / HIP-HOP
+    // MIDI entregas so the plugin grooves match the hand-made material.
+    {"Jerk Bounce", Style::HipHop, {
+      dh(0,kKick,112), dh(3,kKick,94), dh(6,kKick,102), dh(10,kKick,98),
+      dh(8,kSnare,100), dh(12,kClap,106),
+      dh(0,kHat,84), dh(2,kHat,72), dh(4,kHat,78), dh(6,kHat,72),
+      dh(8,kHat,80), dh(10,kHat,68), dh(12,kHat,76), dh(14,kHat,66)}, Character::NuJerk},
+    {"Plugg Hats 16", Style::HipHop, {
+      dh(0,kKick,108), dh(8,kSnare,102), dh(4,kRim,68), dh(12,kRim,66),
+      dh(0,kHat,76), dh(1,kHat,58), dh(2,kHat,68), dh(3,kHat,58),
+      dh(4,kHat,72), dh(5,kHat,58), dh(6,kHat,66), dh(7,kHat,58),
+      dh(8,kHat,76), dh(9,kHat,58), dh(10,kHat,68), dh(11,kHat,58),
+      dh(12,kHat,72), dh(13,kHat,58), dh(14,kHat,66), dh(15,kHat,58)}, Character::Plugg},
+    {"BoomBap Backbeat", Style::HipHop, {
+      dh(0,kKick,112), dh(10,kKick,98),
+      dh(4,kSnare,110), dh(12,kSnare,112), dh(14,kSnare,56),
+      dh(0,kHat,84), dh(2,kHat,68), dh(4,kHat,78), dh(6,kHat,66),
+      dh(8,kHat,80), dh(10,kHat,66), dh(12,kHat,76), dh(14,kHat,64)}, Character::BoomBap},
   };
   return pats;
 }
@@ -165,6 +183,13 @@ const std::vector<BassPattern>& allBassPatterns() {
       bh(10,0,0.5,104), bh(12,0,1.0,110)}, Character::Rage},
     {"Latino 808 B", Style::HipHop, {
       bh(0,0,1.5,110), bh(6,0,1.0,106), bh(11,0,1.5,108), bh(14,7,0.5,98)}, Character::TrapLatino},
+    // ---- Delivered sets (v1.0): 808 figures from the JERK / PLUGG / HIP-HOP entregas.
+    {"Jerk 808 Bounce", Style::HipHop, {
+      bh(0,0,0.5,112), bh(6,0,0.5,100), bh(10,0,0.5,104), bh(13,0,0.25,96)}, Character::NuJerk},
+    {"Plugg Long", Style::HipHop, {
+      bh(0,0,2.25,106), bh(12,0,0.75,96)}, Character::Plugg},
+    {"BoomBap Root", Style::HipHop, {
+      bh(0,0,1.5,104), bh(8,0,1.25,96), bh(14,0,0.5,90)}, Character::BoomBap},
   };
   return pats;
 }

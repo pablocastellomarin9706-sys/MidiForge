@@ -24,7 +24,11 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
       persistidos, **buscar similares**, slider **Var** (variacion) y **audicion**
       de samples dentro del plugin (doble clic)
 - [x] Drag & drop de MIDI (temp `.mid` → drag nativo de Windows)
-- [ ] Descarga legal desde Freesound API (requiere API key gratuita)
+- [x] **Fuentes de samples**: Freesound / SampleFocus (cuentas gratuitas) → descarga
+      manual a tus carpetas vigiladas; el plugin las indexa y audiciona (100 % offline)
+- [x] **Contenido entregado (v1.0)**: JERK, PLUGG y Boom Bap con patrones, 808 y
+      progresiones propios (mismos grooves que los .mid de `MidiForge_Entregas`)
+- [ ] Integracion directa Freesound API (opcional; requiere API key gratuita)
 - [ ] Mini editor de piano roll editable (fase siguiente)
 
 ## Requisitos (para compilar)
@@ -123,6 +127,29 @@ src/
 - El chat es un parser de intenciones 100 % local (sin red).
 - Sample Scout solo **abre el navegador** con la búsqueda preparada.
 - Límite de indexado: 40.000 archivos de audio (wav/aif/aiff/mp3/ogg/flac).
+
+## Fuentes de samples (Freesound / SampleFocus)
+
+El plugin **no descarga nada** (100 % offline). Tu flujo: descarga el sample a una
+carpeta vigilada del navegador (por ejemplo `C:\Users\Pablo\Music\FL\Sample Packs`)
+y el plugin lo indexa solo (BPM/key por nombre, filtros, audicion, drag a FL).
+
+**Freesound** (freesound.org) — cuenta gratuita:
+1. Crea la cuenta y entra (Join, arriba a la derecha).
+2. Descarga desde la web (boton *Download* en cada sonido); cada ficha indica su
+   licencia (CC0 no exige atribucion; CC-BY si requiere mencion).
+3. (Opcional, para automatizar mas adelante) **API key**: en tu cuenta ve al
+   formulario de aplicaciones de la API (`freesound.org/apiv2/apply`),
+   *Request new access credentials*, rellena nombre y descripcion, acepta las
+   condiciones; la key aparece al momento. Con key se puede buscar en la API;
+   descargar originales requiere OAuth2 (previews con la key simple).
+
+**SampleFocus** (samplefocus.com) — cuenta gratuita:
+1. Sign up (email o Google); confirma el correo si te lo pide.
+2. Descarga: icono amarillo en la tarjeta, o boton *Download* en la ficha.
+3. Plan free: 3 creditos de descarga cada lunes + extras por subir samples
+   (4 por upload aprobado). Todos los sonidos son royalty-free sin atribucion
+   (Standard License).
 
 ## Licencia / aviso
 

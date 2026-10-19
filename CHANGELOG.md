@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0 - 2026-10-19
+
+### Added
+- **BoomBap content** (the character had none): dedicated drum pattern
+  ("BoomBap Backbeat": kick 0/10, backbeat 4/12, ghost snare at 14, swung hats),
+  808 root pattern ("BoomBap Root") and the "BoomBap Soul" progression
+  (im7 - ivm7 - VImaj7 - IIImaj7). The character also defaults to a minor scale
+  now instead of quietly falling back to Major.
+- **Delivered-set content**: the JERK / PLUGG / HIP-HOP MIDI entregas are now
+  part of the plugin's DNA — "Jerk Bounce" drums + "Jerk 808 Bounce" + "Jerk
+  Hook" progression (im7-ivm7-VImaj7-V7); "Plugg Hats 16" drums + "Plugg Long"
+  808 + "Plugg Bells" progression (im7-VImaj7-IIImaj7-VII); BoomBap as above.
+
+### Notes
+- First release (`1.0.0`): full QA pass (0.6.1) + delivered-set content + docs.
+- The plugin stays **100 % offline** by design. The sample workflow (Freesound /
+  SampleFocus into your watched folders) is documented in the README.
+
 ## 0.6.1 - 2026-10-19
 
 ### Fixed

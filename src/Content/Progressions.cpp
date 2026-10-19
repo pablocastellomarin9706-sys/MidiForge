@@ -65,6 +65,9 @@ const std::vector<Progression>& allProgressions() {
       {slot(1), slot(1), slot(6), slot(7)}, Character::NuJerk},
     {"Jerk Haze", "i - v - VI - VII", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(5), slot(6), slot(7)}, Character::NuJerk},
+    {"Jerk Hook", "im7 - ivm7 - VImaj7 - V7", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1, 0, "auto", true), slot(4, 0, "auto", true), slot(6, 0, "maj", true),
+       slot(5, 0, "maj", true)}, Character::NuJerk},
     // Trap Oscuro.
     {"Dark Trap", "i - VI - VII - v", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(6), slot(7), slot(5)}, Character::TrapDark},
@@ -75,11 +78,18 @@ const std::vector<Progression>& allProgressions() {
       {slot(1), slot(5), slot(6), slot(4)}, Character::Plugg},
     {"Plugg Float", "i - III - VI - iv", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(3), slot(6), slot(4)}, Character::Plugg},
+    {"Plugg Bells", "im7 - VImaj7 - IIImaj7 - VII", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1, 0, "auto", true), slot(6, 0, "maj", true), slot(3, 0, "maj", true),
+       slot(7)}, Character::Plugg},
     // Rage.
     {"Rage Lift", "i - VI - III - VII", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(6), slot(3), slot(7)}, Character::Rage},
     {"Rage Charge", "i - VII - VI - VII", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(7), slot(6), slot(7)}, Character::Rage},
+    // Boom Bap: soulful diatonic sevenths (Lord Finesse / Cookin Soul school).
+    {"BoomBap Soul", "im7 - ivm7 - VImaj7 - IIImaj7", Style::HipHop, ScaleType::MinorNatural,
+      {slot(1, 0, "auto", true), slot(4, 0, "auto", true), slot(6, 0, "maj", true),
+       slot(3, 0, "maj", true)}, Character::BoomBap},
     // Trap Latino: major V + dembow-friendly loop.
     {"Latino Minor", "i - VII - VI - V", Style::HipHop, ScaleType::MinorNatural,
       {slot(1), slot(7), slot(6), slot(5, 0, "maj")}, Character::TrapLatino},

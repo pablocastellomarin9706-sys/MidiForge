@@ -51,6 +51,7 @@ inline ScaleType defaultScaleFor(Character c) {
     case Character::TrapDark:
     case Character::Plugg:
     case Character::NuJerk:
+    case Character::BoomBap:
     case Character::Rage:       return ScaleType::MinorNatural;
     case Character::None:       break;
   }
