@@ -12,6 +12,12 @@ MidiForgeAudioProcessor::MidiForgeAudioProcessor()
   currentIdea.keyRoot = 0;
   currentIdea.scale = ScaleType::Major;
   formatManager.registerBasicFormats();
+
+  // The optional Freesound API key is persisted outside the project too, so it
+  // only has to be pasted once.
+  const auto keyFile = freesoundKeyFile();
+  if (keyFile.existsAsFile())
+    freesoundKey = keyFile.loadFileAsString().trim();
 }
 
 MidiForgeAudioProcessor::~MidiForgeAudioProcessor() {}
@@ -76,6 +82,7 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   xml.setAttribute("version", 3);
   xml.setAttribute("folders", sampleLibrary.getFolders().joinIntoString("\n"));
   xml.setAttribute("favorites", sampleLibrary.getFavorites().joinIntoString("\n"));
+  xml.setAttribute("freesoundKey", freesoundKey);
 
   // Last idea (musical settings + curated picks). The generators are fully
   // deterministic given seed + take, so a reopened session rebuilds the exact
@@ -113,6 +120,9 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   favorites.removeEmptyStrings();
   sampleLibrary.setFavorites(favorites);
 
+  const auto storedKey = xml->getStringAttribute("freesoundKey", juce::String());
+  if (storedKey.isNotEmpty()) freesoundKey = storedKey;
+
   // Older states (v < 3) only carried folders/favourites.
   if (!xml->hasAttribute("seed")) return;
 
@@ -141,12 +151,19 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   IdeaGenerator gen;
   gen.generateFromSaved(idea);
   IdeaGenerator::applyCreativity(idea, idea.creativity, 0);
+
+  // Sounds for the restored idea (best effort: the sample scan may still be
+  // running; the SONIDO tab tops up the empty slots once it is ready).
+  autoSoundRoll = 0;
+  pickAutoSoundsForIdea();
 }
 
 void MidiForgeAudioProcessor::generateFull() {
   IdeaGenerator gen;
   gen.generateFull(currentIdea);
   IdeaGenerator::applyCreativity(currentIdea, currentIdea.creativity, 0);
+  autoSoundRoll = 0;
+  pickAutoSoundsForIdea();
 }
 
 void MidiForgeAudioProcessor::regenerateTrack(const juce::String& name) {
@@ -159,6 +176,81 @@ void MidiForgeAudioProcessor::regenerateTrack(const juce::String& name) {
       if (t.name == name)
         IdeaGenerator::applyCreativityToTrack(t, currentIdea.creativity, rng);
   }
+
+  // A replaced layer also gets a fresh sound for that layer.
+  if (name == "Melody") rerollAutoSound(SoundSlot::Melody);
+  else if (name == "Chords") rerollAutoSound(SoundSlot::Chords);
+  else if (name == "Bass") rerollAutoSound(SoundSlot::Bass);
+  else if (name == "Drums")
+    for (int s = (int)SoundSlot::Kick; s <= (int)SoundSlot::Crash; ++s)
+      rerollAutoSound((SoundSlot)s);
+}
+
+void MidiForgeAudioProcessor::pickAutoSoundsForIdea() {
+  const auto lib = sampleLibrary.snapshot();
+  ++autoSoundRoll;
+  const int seed = currentIdea.seed * 7 + currentIdea.take * 7919 + autoSoundRoll * 104729 + 1;
+  autoSounds = pickAutoSounds(lib, currentIdea.character, currentIdea.keyRoot, seed);
+}
+
+void MidiForgeAudioProcessor::fillEmptyAutoSounds() {
+  const auto lib = sampleLibrary.snapshot();
+  if (lib.empty()) return;
+  for (int s = 0; s < kNumSoundSlots; ++s) {
+    if (autoSounds.paths[s].isNotEmpty()) continue;
+    ++autoSoundRoll;
+    const int seed = currentIdea.seed * 7 + currentIdea.take * 7919 +
+                     autoSoundRoll * 104729 + s * 131;
+    pickOneSlot(autoSounds, lib, currentIdea.character, currentIdea.keyRoot,
+                (SoundSlot)s, seed, {});
+  }
+}
+
+void MidiForgeAudioProcessor::rerollAutoSound(SoundSlot slot) {
+  const auto lib = sampleLibrary.snapshot();
+  if (lib.empty()) return;
+  ++autoSoundRoll;
+  const int seed = currentIdea.seed * 7 + currentIdea.take * 7919 + autoSoundRoll * 104729 +
+                   (int)slot * 131;
+  pickOneSlot(autoSounds, lib, currentIdea.character, currentIdea.keyRoot, slot, seed,
+              autoSounds.paths[(int)slot]);
+}
+
+juce::File MidiForgeAudioProcessor::renderTrackAudio(const juce::String& trackName) {
+  return renderIdeaToWav(currentIdea, trackName, autoSounds, getHostBpm(), false);
+}
+
+juce::File MidiForgeAudioProcessor::renderMixAudio() {
+  return renderIdeaToWav(currentIdea, juce::String(), autoSounds, getHostBpm(), true);
+}
+
+juce::File MidiForgeAudioProcessor::freesoundKeyFile() const {
+  return juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+      .getChildFile("MidiForge")
+      .getChildFile("freesound_key.txt");
+}
+
+void MidiForgeAudioProcessor::setFreesoundKey(const juce::String& key) {
+  freesoundKey = key.trim();
+  const auto f = freesoundKeyFile();
+  if (freesoundKey.isEmpty()) {
+    f.deleteFile();
+  } else {
+    f.getParentDirectory().createDirectory();
+    f.replaceWithText(freesoundKey);
+  }
+}
+
+bool MidiForgeAudioProcessor::fetchFreesoundForSlot(SoundSlot slot, juce::String& status) {
+  const auto cache = juce::File::getSpecialLocation(juce::File::userMusicDirectory)
+                         .getChildFile("MidiForge_Cache");
+  juce::String st;
+  const auto f = fetchFreesoundSound(freesoundKey, slot, currentIdea.character, cache, st);
+  status = st;
+  if (!f.existsAsFile()) return false;
+  autoSounds.paths[(int)slot] = f.getFullPathName();
+  autoSounds.names[(int)slot] = f.getFileName();
+  return true;
 }
 
 bool MidiForgeAudioProcessor::previewSample(const juce::File& file) {

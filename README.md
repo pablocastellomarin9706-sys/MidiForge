@@ -2,8 +2,9 @@
 
 Plugin **VST3** de generación de ideas MIDI para **FL Studio** (Windows), inspirado en
 Output *Co-Producer*. Genera **acordes, melodía, bajo y batería** de forma
-**100 % offline** (algorítmico, sin APIs ni internet), permite **arrastrar los clips
-MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
+**algorítmica** (sin internet salvo el botón Freesound *opcional* de la pestaña
+SONIDO), **elige y aplica un sonido por capa** (Auto-Sound) y permite **arrastrar
+los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
 
 ## Estado
 
@@ -19,7 +20,6 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
 - [x] **Sample Scout**: búsquedas en Splice / Freesound / SampleFocus / Loopcloud /
       Samplette / YouTube / SoundCloud + **búsquedas rápidas por género** (jerk,
       detroit, trap, plugg, hiphop, uk, synth, chords, melodies); abre el navegador
-      (el plugin nunca accede a internet)
 - [x] **Navegador de samples local**: indexa tus carpetas en segundo plano,
       detecta BPM/key por nombre, filtros y **drag de audio directo a FL**
 - [x] **Co-Producer style (offline)**: BPM del proyecto + chip **FIT**, favoritos
@@ -27,10 +27,11 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
       de samples dentro del plugin (doble clic)
 - [x] Drag & drop de MIDI (temp `.mid` → drag nativo de Windows)
 - [x] **Fuentes de samples**: Freesound / SampleFocus (cuentas gratuitas) → descarga
-      manual a tus carpetas vigiladas; el plugin las indexa y audiciona (100 % offline)
+      manual a tus carpetas vigiladas; el plugin las indexa y audiciona
 - [x] **Contenido entregado (v1.0)**: JERK, PLUGG y Boom Bap con patrones, 808 y
       progresiones propios (mismos grooves que los .mid de `MidiForge_Entregas`)
-- [ ] Integracion directa Freesound API (opcional; requiere API key gratuita)
+- [x] **Auto-Sound (SONIDO)** + **Freesound API** (opcional, con tu key gratis):
+      sonido automático por capa, renders WAV y descarga CC0 al vuelo
 - [ ] Mini editor de piano roll editable (fase siguiente)
 
 ## Requisitos (para compilar)
@@ -83,8 +84,19 @@ build/MidiForge_artefacts/Release/VST3/MidiForge.vst3
    - **Clic derecho** en una fila: *Buscar similares*, escuchar/parar, anadir a
      favoritos o revelar en el explorador.
    - **Doble clic** en una fila: audicion dentro del plugin (otra vez, para).
-5. Pulsa **Replace** en cualquier track para obtener otra variante de esa capa.
-6. Arrastra desde **"Drag MIDI → Track"** hasta el **Piano Roll** de FL.
+5. Abre la pestaña **SONIDO** (Auto-Sound): el plugin ya ha elegido un sonido por
+   capa.
+   - **Escuchar**: oye el sample (melodía/acordes/bajo) o el kit/mezcla renderizada.
+   - **Otro** / **Variar todo**: infinitas variaciones de sonido.
+   - Chips **Sample** / **Loop** / **Mezcla**: arrástralos a FL. El Loop es un WAV
+     renderizado al BPM del proyecto con los sonidos elegidos.
+   - **Freesound** (opcional): pega tu API key gratuita y pulsa Guardar; busca y
+     descarga un preview CC0 para esa capa a `Music\MidiForge_Cache` (también
+     aparecen en SAMPLES). Sin key, todo sigue siendo 100 % local.
+   - **Web**: abre SampleFocus con la búsqueda del género.
+6. Pulsa **Replace** en cualquier track para obtener otra variante de esa capa
+   (también trae un sonido nuevo para la capa).
+7. Arrastra desde **"Drag MIDI → Track"** hasta el **Piano Roll** de FL.
 
 ### Forge Chat (offline) — ejemplos
 
@@ -126,25 +138,33 @@ src/
   (velocity, micro-timing, octavas) sobre la idea generada sin tocar la seed.
 - La **audicion** reproduce el archivo por la salida del plugin (doble clic);
   formatos: wav/aif/aiff/mp3/ogg/flac (lectores basicos de JUCE).
+- **Auto-Sound** elige sonidos por palabras del nombre (bell, 808, kick...) con
+  sinonimos por genero y, en capas melodicas, prefiere muestras en la tonalidad
+  de la idea. El render WAV (44.1 kHz, 24-bit estereo) resamplea y afina cada
+  muestra; el nombre del loop incluye el BPM del proyecto.
+- **Freesound** solo se consulta al pulsar su boton (requiere key gratuita;
+  60 req/min) y descarga unicamente previews con licencia CC0.
 - El chat es un parser de intenciones 100 % local (sin red).
 - Sample Scout solo **abre el navegador** con la búsqueda preparada.
 - Límite de indexado: 40.000 archivos de audio (wav/aif/aiff/mp3/ogg/flac).
 
 ## Fuentes de samples (Freesound / SampleFocus)
 
-El plugin **no descarga nada** (100 % offline). Tu flujo: descarga el sample a una
-carpeta vigilada del navegador (por ejemplo `C:\Users\Pablo\Music\FL\Sample Packs`)
-y el plugin lo indexa solo (BPM/key por nombre, filtros, audicion, drag a FL).
+El plugin **no descarga nada por su cuenta**: o bajas el sample a una carpeta
+vigilada (por ejemplo `C:\Users\Pablo\Music\FL\Sample Packs`) y el plugin lo indexa
+solo (BPM/key por nombre, filtros, audicion, drag a FL), o usas el boton
+**Freesound** de la pestana SONIDO (descarga directa con tu API key, solo CC0).
 
 **Freesound** (freesound.org) — cuenta gratuita:
 1. Crea la cuenta y entra (Join, arriba a la derecha).
 2. Descarga desde la web (boton *Download* en cada sonido); cada ficha indica su
    licencia (CC0 no exige atribucion; CC-BY si requiere mencion).
-3. (Opcional, para automatizar mas adelante) **API key**: en tu cuenta ve al
-   formulario de aplicaciones de la API (`freesound.org/apiv2/apply`),
-   *Request new access credentials*, rellena nombre y descripcion, acepta las
-   condiciones; la key aparece al momento. Con key se puede buscar en la API;
-   descargar originales requiere OAuth2 (previews con la key simple).
+3. **API key (integrada en el plugin)**: en tu cuenta ve al formulario de
+   aplicaciones de la API (`freesound.org/apiv2/apply`), *Request new access
+   credentials*, rellena nombre y descripcion, acepta las condiciones; la key
+   aparece al momento. Pégala en la pestaña **SONIDO** del plugin (botón
+   Guardar): el botón **Freesound** de cada capa buscará y descargará previews
+   CC0 automáticamente. Descargar originales requeriría OAuth2 (no necesario).
 
 **SampleFocus** (samplefocus.com) — cuenta gratuita:
 1. Sign up (email o Google); confirma el correo si te lo pide.

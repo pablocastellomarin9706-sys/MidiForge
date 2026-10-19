@@ -5,6 +5,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include "Core/Types.h"
+#include "Samples/AutoSound.h"
 #include "Samples/SampleLibrary.h"
 
 namespace MidiForge {
@@ -50,10 +51,30 @@ public:
   void stopPreviewLocked(); // requires previewLock to be held
   bool isPreviewing() const { return previewing.load(); }
 
+  // --- Auto-Sound: one sound per layer, picked for the current idea ---------
+
+  AutoSoundSet& getAutoSounds() { return autoSounds; }
+  void pickAutoSoundsForIdea(); // full (re)pick; also the "Variar todo" path
+  void fillEmptyAutoSounds();   // top-up once the sample scan is ready
+  void rerollAutoSound(SoundSlot slot);
+  juce::File renderTrackAudio(const juce::String& trackName);
+  juce::File renderMixAudio();
+
+  // Optional Freesound integration (needs the user's free API key).
+  juce::String getFreesoundKey() const { return freesoundKey; }
+  void setFreesoundKey(const juce::String& key);
+  bool fetchFreesoundForSlot(SoundSlot slot, juce::String& status);
+
 private:
   SessionIdea currentIdea;
   int regenCounter{0};
   SampleLibrary sampleLibrary;
+
+  // Auto-Sound state (message thread only).
+  AutoSoundSet autoSounds;
+  int autoSoundRoll{0};
+  juce::String freesoundKey;
+  juce::File freesoundKeyFile() const;
 
   // Guards the preview transport: processBlock pulls from it on the audio
   // thread while previewSample/stopPreview rewire it on the message thread.

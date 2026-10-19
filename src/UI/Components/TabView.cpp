@@ -77,10 +77,14 @@ TabView::TabView(MidiForgeAudioProcessor& p) : tabs(juce::TabbedButtonBar::TabsA
 
   samplePage = std::make_unique<SampleBrowser>(p);
   tabs.addTab("SAMPLES", Palette::panel, samplePage.get(), false);
+
+  soundPage = std::make_unique<AutoSoundPanel>(p);
+  tabs.addTab("SONIDO", Palette::panel, soundPage.get(), false);
 }
 
 void TabView::refreshAll() {
   for(auto& p : pages) p->refresh();
+  if (soundPage) soundPage->refresh();
 }
 
 void TabView::resized() {

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 1.0.0
+  VERSION 1.1.0
   LANGUAGES CXX
 )
 
@@ -98,8 +98,12 @@ target_sources(MidiForge
     src/UI/Components/ChatPanel.h
     src/UI/Components/SampleBrowser.cpp
     src/UI/Components/SampleBrowser.h
+    src/UI/Components/AutoSoundPanel.cpp
+    src/UI/Components/AutoSoundPanel.h
     src/Samples/SampleLibrary.cpp
     src/Samples/SampleLibrary.h
+    src/Samples/AutoSound.cpp
+    src/Samples/AutoSound.h
 )
 
 target_compile_definitions(MidiForge

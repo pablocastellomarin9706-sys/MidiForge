@@ -10,6 +10,7 @@
 #include "DrumGrid.h"
 #include "DragHandle.h"
 #include "SampleBrowser.h"
+#include "AutoSoundPanel.h"
 
 namespace MidiForge {
 
@@ -45,6 +46,7 @@ private:
   juce::TabbedComponent tabs{juce::TabbedButtonBar::TabsAtTop};
   std::vector<std::unique_ptr<TrackPage>> pages;
   std::unique_ptr<SampleBrowser> samplePage;
+  std::unique_ptr<AutoSoundPanel> soundPage;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TabView)
 };

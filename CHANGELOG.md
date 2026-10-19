@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0 - 2026-10-19
+
+### Added
+- **Auto-Sound (pestana SONIDO)**: cada idea elige automaticamente un sonido por
+  capa desde tus carpetas de samples (bell/pluck para plugg y jerk, piano/rhodes
+  para boom bap, leads para rage, 808 para el bajo, kick/snare/clap/hats/crash
+  para la bateria). En melodia/acordes/bajo prefiere muestras cuya tonalidad
+  coincide con la idea (pick armonico).
+- **Render WAV por capa y mezcla**: "Escuchar" renderiza la idea con los sonidos
+  elegidos (pitch-shift afinado por muestra); los chips Sample / Loop / Mezcla
+  se arrastran directamente a FL (el nombre incluye el BPM del proyecto).
+- **Otro / Variar todo**: variaciones ilimitadas de sonido; Replace de una capa
+  tambien trae un sonido nuevo para esa capa.
+- **Freesound integrado (opcional)**: boton Freesound en melodia, acordes y bajo.
+  Con tu API key gratuita (freesound.org/apiv2/apply) busca y descarga previews
+  CC0 a `Music\MidiForge_Cache` (se indexan tambien en SAMPLES). Sin key, el
+  plugin sigue 100 % local.
+- Boton **Web** por capa melodica: abre SampleFocus con la busqueda del genero.
+
+### Notes
+- La bateria sale siempre de tus packs locales; Freesound cubre melodia,
+  acordes y bajo, y solo se consulta cuando pulsas su boton (nunca automatico).
+
 ## 1.0.0 - 2026-10-19
 
 ### Added
