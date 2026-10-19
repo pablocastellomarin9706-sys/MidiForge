@@ -16,7 +16,8 @@ juce::MidiFile MidiBuilder::build(const SessionIdea& idea) {
     if (t.notes.empty()) continue;
 
     juce::MidiMessageSequence seq;
-    seq.addEvent(juce::MidiMessage::trackName(t.name), 0);
+    // Meta event 0x03 = Track Name. (JUCE ships no trackName() helper.)
+    seq.addEvent(juce::MidiMessage::textMetaEvent(0x03, t.name), 0);
 
     for (const auto& n : t.notes) {
       if (n.start < 0.0 || n.length <= 0.0) continue;
