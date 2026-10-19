@@ -21,7 +21,7 @@ MidiForgeLookAndFeel::MidiForgeLookAndFeel() {
   setColour(juce::ComboBox::backgroundColourId, Palette::card);
   setColour(juce::ComboBox::textColourId, Palette::textPrimary);
   setColour(juce::ComboBox::outlineColourId, Palette::border);
-  setColour(juce::ComboBox::arrowColourId, Palette::textSecondary);
+  setColour(juce::ComboBox::arrowColourId, Palette::accent);
 
   setColour(juce::PopupMenu::backgroundColourId, Palette::panelAlt);
   setColour(juce::PopupMenu::textColourId, Palette::textPrimary);
@@ -69,52 +69,61 @@ void MidiForgeLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button&
                                                 bool shouldDrawButtonAsHighlighted,
                                                 bool shouldDrawButtonAsDown) {
   auto bounds = button.getLocalBounds().toFloat().reduced(0.5f);
-  const float radius = juce::jmin(6.0f, bounds.getHeight() * 0.25f);
+  const float cut = juce::jmin(8.0f, bounds.getHeight() * 0.34f);
   const bool primary = button.getToggleState() || backgroundColour == Palette::accent;
 
   juce::Colour base = primary ? Palette::accent : backgroundColour;
+  if (shouldDrawButtonAsDown) base = base.darker(0.28f);
+  else if (shouldDrawButtonAsHighlighted) base = base.brighter(primary ? 0.10f : 0.20f);
 
-  if (shouldDrawButtonAsDown) base = base.darker(0.25f);
-  else if (shouldDrawButtonAsHighlighted) base = base.brighter(primary ? 0.08f : 0.18f);
+  const juce::Colour top = primary ? base.brighter(0.12f) : base.brighter(0.10f);
+  const juce::Colour bot = primary ? Palette::ember.darker(0.12f) : base.darker(0.24f);
+  auto path = chamferRect(bounds, cut);
 
-  juce::ColourGradient grad(base.brighter(primary ? 0.05f : 0.07f), bounds.getX(), bounds.getY(),
-                            base.darker(primary ? 0.09f : 0.14f), bounds.getX(), bounds.getBottom(), false);
-  g.setGradientFill(grad);
-  g.fillRoundedRectangle(bounds, radius);
+  // Molten halo around the primary action.
+  if (primary) {
+    g.setColour(Palette::accent.withAlpha(shouldDrawButtonAsHighlighted ? 0.45f : 0.26f));
+    g.strokePath(chamferRect(bounds.expanded(1.6f), cut + 1.6f), juce::PathStrokeType(2.0f));
+  }
 
-  // Metal top highlight.
-  g.setColour(juce::Colours::white.withAlpha(primary ? 0.20f : 0.06f));
-  g.drawHorizontalLine((int)bounds.getY() + 1, bounds.getX() + radius, bounds.getRight() - radius);
+  g.setGradientFill(juce::ColourGradient(top, bounds.getX(), bounds.getY(),
+                                         bot, bounds.getX(), bounds.getBottom(), false));
+  g.fillPath(path);
+
+  // Hot top edge (light hitting the anvil).
+  g.setColour(juce::Colours::white.withAlpha(primary ? 0.30f : 0.07f));
+  g.drawHorizontalLine((int)bounds.getY() + 1, bounds.getX() + cut, bounds.getRight() - cut);
 
   // Border + hover glow.
-  if (shouldDrawButtonAsHighlighted && !primary) {
-    g.setColour(Palette::accent.withAlpha(0.85f));
-  } else if (primary) {
-    g.setColour(Palette::accentSoft.withAlpha(0.55f));
-  } else {
-    g.setColour(Palette::border);
-  }
-  g.drawRoundedRectangle(bounds, radius, 1.0f);
-
-  if (primary) {
-    g.setColour(Palette::accent.withAlpha(0.22f));
-    g.drawRoundedRectangle(bounds.expanded(1.0f), radius + 1.0f, 1.0f);
-  }
+  if (shouldDrawButtonAsHighlighted && !primary) g.setColour(Palette::accent.withAlpha(0.9f));
+  else if (primary) g.setColour(Palette::hot.withAlpha(0.55f));
+  else g.setColour(Palette::border);
+  g.strokePath(path, juce::PathStrokeType(1.0f));
 }
 
 void MidiForgeLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graphics& g,
                                          bool isMouseOver, bool isMouseDown) {
   auto bounds = button.getLocalBounds().toFloat();
   const bool active = button.getToggleState();
+  auto box = bounds.reduced(3.0f, 5.0f);
+  auto path = chamferRect(box, 6.0f);
 
   if (active) {
-    g.setColour(Palette::panelAlt.brighter(0.06f));
-    g.fillRoundedRectangle(bounds.reduced(3.0f, 4.0f), 5.0f);
-    g.setColour(Palette::accent);
-    g.fillRoundedRectangle(bounds.removeFromBottom(2.5f).reduced(6.0f, 0.0f), 1.25f);
+    g.setGradientFill(juce::ColourGradient(Palette::cardHover, box.getX(), box.getY(),
+                                           Palette::card, box.getX(), box.getBottom(), false));
+    g.fillPath(path);
+    g.setColour(Palette::accent.withAlpha(0.40f));
+    g.strokePath(path, juce::PathStrokeType(1.0f));
+
+    auto ul = bounds.removeFromBottom(3.0f).reduced(7.0f, 0.0f);
+    g.setColour(Palette::accent.withAlpha(0.30f));
+    g.fillRoundedRectangle(ul.expanded(1.6f, 1.2f), 2.0f);
+    g.setGradientFill(juce::ColourGradient(Palette::accent, ul.getX(), 0.0f,
+                                           Palette::hot, ul.getRight(), 0.0f, false));
+    g.fillRoundedRectangle(ul, 1.5f);
   } else if (isMouseOver || isMouseDown) {
     g.setColour(Palette::card.withAlpha(0.65f));
-    g.fillRoundedRectangle(bounds.reduced(3.0f, 4.0f), 5.0f);
+    g.fillPath(path);
   }
 
   g.setColour(active ? Palette::textPrimary : Palette::textSecondary);
@@ -125,23 +134,24 @@ void MidiForgeLookAndFeel::drawTabButton(juce::TabBarButton& button, juce::Graph
 void MidiForgeLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, bool isButtonDown,
                                         int, int, int, int, juce::ComboBox& box) {
   auto bounds = juce::Rectangle<float>(0.0f, 0.0f, (float)width, (float)height).reduced(0.5f);
-  const float radius = juce::jmin(6.0f, bounds.getHeight() * 0.25f);
+  const float cut = juce::jmin(7.0f, bounds.getHeight() * 0.32f);
+  auto path = chamferRect(bounds, cut);
 
   g.setColour(isButtonDown ? Palette::cardHover : Palette::card);
-  g.fillRoundedRectangle(bounds, radius);
+  g.fillPath(path);
 
-  g.setColour(box.hasKeyboardFocus(false) ? Palette::accent.withAlpha(0.85f) : Palette::border);
-  g.drawRoundedRectangle(bounds, radius, 1.0f);
+  g.setColour(box.hasKeyboardFocus(false) ? Palette::accent.withAlpha(0.9f) : Palette::border);
+  g.strokePath(path, juce::PathStrokeType(1.0f));
 
-  // Steel chevron.
+  // Molten chevron.
   juce::Path p;
   const float cx = bounds.getRight() - 12.0f;
   const float cy = bounds.getCentreY();
   p.startNewSubPath(cx - 4.0f, cy - 2.0f);
   p.lineTo(cx, cy + 3.0f);
   p.lineTo(cx + 4.0f, cy - 2.0f);
-  g.setColour(Palette::textSecondary);
-  g.strokePath(p, juce::PathStrokeType(1.6f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+  g.setColour(Palette::accent);
+  g.strokePath(p, juce::PathStrokeType(1.7f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 }
 
 void MidiForgeLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
@@ -154,18 +164,23 @@ void MidiForgeLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int
   }
 
   auto track = juce::Rectangle<float>((float)x, (float)y, (float)width, (float)height)
-                   .withSizeKeepingCentre((float)width, 4.0f);
-  const float radius = 2.0f;
+                   .withSizeKeepingCentre((float)width, 5.0f);
+  const float radius = 2.5f;
 
-  g.setColour(Palette::background.brighter(0.10f));
+  g.setColour(Palette::background.brighter(0.12f));
   g.fillRoundedRectangle(track, radius);
 
   auto fill = track.withWidth(juce::jmax(0.0f, sliderPos - track.getX()));
-  g.setColour(Palette::accent);
-  g.fillRoundedRectangle(fill, radius);
+  if (fill.getWidth() > 0.5f) {
+    g.setGradientFill(juce::ColourGradient(Palette::ember, fill.getX(), 0.0f,
+                                           Palette::accentSoft, fill.getRight(), 0.0f, false));
+    g.fillRoundedRectangle(fill, radius);
+  }
 
-  // Steel thumb.
+  // Ember thumb with a soft halo.
   const float cy = track.getCentreY();
+  g.setColour(Palette::accent.withAlpha(0.30f));
+  g.fillEllipse(sliderPos - 9.5f, cy - 9.5f, 19.0f, 19.0f);
   g.setColour(Palette::background);
   g.fillEllipse(sliderPos - 6.5f, cy - 6.5f, 13.0f, 13.0f);
   g.setColour(Palette::accentSoft);
@@ -190,7 +205,7 @@ void MidiForgeLookAndFeel::drawScrollbar(juce::Graphics& g, juce::ScrollBar&, in
                                (float)thumbSize, (float)height - 3.0f);
 
   g.setColour(isMouseDown ? Palette::accent
-                          : (isMouseOver ? Palette::accentDim.brighter(0.25f)
+                          : (isMouseOver ? Palette::ember.brighter(0.15f)
                                          : Palette::border.brighter(0.15f)));
   g.fillRoundedRectangle(thumb, 3.0f);
 }
@@ -199,7 +214,7 @@ void MidiForgeLookAndFeel::fillTextEditorBackground(juce::Graphics& g, int width
                                                     juce::TextEditor& ed) {
   auto bounds = juce::Rectangle<float>(0.0f, 0.0f, (float)width, (float)height).reduced(0.5f);
   g.setColour(ed.findColour(juce::TextEditor::backgroundColourId));
-  g.fillRoundedRectangle(bounds, 6.0f);
+  g.fillPath(chamferRect(bounds, 7.0f));
 }
 
 void MidiForgeLookAndFeel::drawTextEditorOutline(juce::Graphics& g, int width, int height,
@@ -210,7 +225,7 @@ void MidiForgeLookAndFeel::drawTextEditorOutline(juce::Graphics& g, int width, i
                              : juce::TextEditor::outlineColourId);
   if (c.isTransparent()) c = Palette::border;
   g.setColour(c);
-  g.drawRoundedRectangle(bounds, 6.0f, 1.0f);
+  g.strokePath(chamferRect(bounds, 7.0f), juce::PathStrokeType(1.0f));
 }
 
 } // namespace MidiForge

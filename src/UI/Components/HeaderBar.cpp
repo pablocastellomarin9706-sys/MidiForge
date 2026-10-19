@@ -161,69 +161,92 @@ void HeaderBar::refreshFromIdea() {
 void HeaderBar::paint(juce::Graphics& g) {
   auto r = getLocalBounds().toFloat();
 
-  // Steel panel gradient.
-  juce::ColourGradient bg(Palette::panel.brighter(0.04f), r.getX(), r.getY(),
-                          Palette::panel.darker(0.18f), r.getX(), r.getBottom(), false);
+  // Warm workshop panel.
+  juce::ColourGradient bg(Palette::panel.brighter(0.05f), r.getX(), r.getY(),
+                          Palette::panel.darker(0.30f), r.getX(), r.getBottom(), false);
   g.setGradientFill(bg);
   g.fillRect(r);
 
-  // Slow cold sheen sweeping across the metal.
+  // Heat bleeding up from the molten bottom edge.
+  juce::ColourGradient heat(Palette::ember.withAlpha(0.0f), r.getCentreX(), r.getY(),
+                            Palette::accent.withAlpha(0.14f), r.getCentreX(), r.getBottom(), false);
+  g.setGradientFill(heat);
+  g.fillRect(r);
+
+  // Slow warm sheen sweeping across the metal.
   const float sheenX = -240.0f + (float)sheenPhase * (r.getWidth() + 480.0f);
   {
     juce::ColourGradient left(juce::Colours::white.withAlpha(0.0f), sheenX - 160.0f, 0.0f,
-                              juce::Colours::white.withAlpha(0.035f), sheenX, 0.0f, false);
+                              juce::Colours::white.withAlpha(0.040f), sheenX, 0.0f, false);
     g.setGradientFill(left);
     g.fillRect(0.0f, 0.0f, juce::jmax(0.0f, sheenX), r.getHeight());
 
-    juce::ColourGradient right(juce::Colours::white.withAlpha(0.035f), sheenX, 0.0f,
+    juce::ColourGradient right(juce::Colours::white.withAlpha(0.040f), sheenX, 0.0f,
                                juce::Colours::white.withAlpha(0.0f), sheenX + 160.0f, 0.0f, false);
     g.setGradientFill(right);
     g.fillRect(juce::jmax(0.0f, sheenX), 0.0f,
                juce::jmax(0.0f, r.getWidth() - sheenX), r.getHeight());
   }
 
-  // Bottom edge: steel light fading out from the centre.
+  // Molten bottom edge: orange turning to hot magenta, fading at both ends.
   {
-    juce::ColourGradient l(juce::Colours::transparentBlack, r.getX(), 0.0f,
-                           Palette::accent.withAlpha(0.85f), r.getCentreX(), 0.0f, false);
-    g.setGradientFill(l);
-    g.fillRect(r.getX(), r.getBottom() - 1.0f, r.getWidth() * 0.5f, 1.0f);
-
-    juce::ColourGradient r2(Palette::accent.withAlpha(0.85f), r.getCentreX(), 0.0f,
-                            juce::Colours::transparentBlack, r.getRight(), 0.0f, false);
-    g.setGradientFill(r2);
-    g.fillRect(r.getCentreX(), r.getBottom() - 1.0f, r.getWidth() * 0.5f, 1.0f);
+    juce::ColourGradient edge(juce::Colours::transparentBlack, r.getX(), 0.0f,
+                              juce::Colours::transparentBlack, r.getRight(), 0.0f, false);
+    edge.addColour(0.34, Palette::accent.withAlpha(0.00f));
+    edge.addColour(0.50, Palette::accent.withAlpha(0.95f));
+    edge.addColour(0.68, Palette::hot.withAlpha(0.90f));
+    edge.addColour(0.84, Palette::ember.withAlpha(0.00f));
+    g.setGradientFill(edge);
+    g.fillRect(r.getX(), r.getBottom() - 1.5f, r.getWidth(), 1.5f);
   }
 
-  // Logo: accent badge with a spark, then the two-tone wordmark.
+  // Logo: chamfered molten badge holding a dark anvil, then the wordmark.
   auto tb = titleLabel.getBounds();
   if (tb.getWidth() > 40) {
-    auto badge = juce::Rectangle<float>((float)tb.getX(), (float)tb.getCentreY() - 14.0f, 28.0f, 28.0f);
+    auto badge = juce::Rectangle<float>((float)tb.getX(), (float)tb.getCentreY() - 15.0f, 30.0f, 30.0f);
+
+    // Molten glow behind the badge.
+    g.setColour(Palette::accent.withAlpha(0.30f));
+    g.strokePath(chamferRect(badge.expanded(2.0f), 9.0f), juce::PathStrokeType(3.0f));
+
+    auto badgePath = chamferRect(badge, 8.0f);
     g.setGradientFill(juce::ColourGradient(Palette::accentSoft, badge.getX(), badge.getY(),
-                                           Palette::accent.darker(0.2f), badge.getRight(),
-                                           badge.getBottom(), false));
-    g.fillRoundedRectangle(badge, 8.0f);
-    g.setColour(Palette::accentSoft.withAlpha(0.35f));
-    g.drawRoundedRectangle(badge.expanded(1.0f), 9.0f, 1.0f);
+                                           Palette::hot, badge.getRight(), badge.getBottom(), false));
+    g.fillPath(badgePath);
 
+    // Hot top edge.
+    g.setColour(juce::Colours::white.withAlpha(0.35f));
+    g.drawHorizontalLine((int)badge.getY() + 2, badge.getX() + 8.0f, badge.getRight() - 8.0f);
+
+    // Dark anvil silhouette.
     const float cx = badge.getCentreX(), cy = badge.getCentreY();
-    juce::Path spark;
-    spark.startNewSubPath(cx, cy - 8.5f);
-    spark.lineTo(cx + 2.8f, cy - 2.8f);
-    spark.lineTo(cx + 8.5f, cy);
-    spark.lineTo(cx + 2.8f, cy + 2.8f);
-    spark.lineTo(cx, cy + 8.5f);
-    spark.lineTo(cx - 2.8f, cy + 2.8f);
-    spark.lineTo(cx - 8.5f, cy);
-    spark.lineTo(cx - 2.8f, cy - 2.8f);
-    spark.closeSubPath();
+    juce::Path anvil;
+    anvil.startNewSubPath(cx - 9.0f, cy - 6.5f);
+    anvil.lineTo(cx + 7.5f, cy - 6.5f);
+    anvil.lineTo(cx + 7.5f, cy - 2.5f);
+    anvil.lineTo(cx + 2.8f, cy - 2.5f);
+    anvil.lineTo(cx + 2.8f, cy + 2.5f);
+    anvil.lineTo(cx + 7.0f, cy + 2.5f);
+    anvil.lineTo(cx + 7.0f, cy + 6.5f);
+    anvil.lineTo(cx - 7.0f, cy + 6.5f);
+    anvil.lineTo(cx - 7.0f, cy + 2.5f);
+    anvil.lineTo(cx - 2.8f, cy + 2.5f);
+    anvil.lineTo(cx - 2.8f, cy - 2.5f);
+    anvil.lineTo(cx - 9.0f, cy - 2.5f);
+    anvil.closeSubPath();
     g.setColour(Palette::background);
-    g.fillPath(spark);
+    g.fillPath(anvil);
 
-    auto textArea = tb.withTrimmedLeft(38);
+    // Two warm sparks flying off the anvil.
+    g.setColour(Palette::accentSoft.withAlpha(0.95f));
+    g.fillEllipse(badge.getRight() - 6.0f, badge.getY() + 4.0f, 2.4f, 2.4f);
+    g.setColour(juce::Colours::white.withAlpha(0.85f));
+    g.fillEllipse(badge.getRight() - 2.5f, badge.getY() + 9.0f, 1.4f, 1.4f);
+
+    auto textArea = tb.withTrimmedLeft(40);
     juce::AttributedString as;
     as.append("Midi", juce::Font(juce::FontOptions(21.0f, juce::Font::bold)), Palette::textPrimary);
-    as.append("Forge", juce::Font(juce::FontOptions(21.0f)), Palette::accent);
+    as.append("Forge", juce::Font(juce::FontOptions(21.0f, juce::Font::bold)), Palette::accent);
     as.setJustification(juce::Justification::centredLeft);
 
     juce::TextLayout tl;
@@ -235,7 +258,7 @@ void HeaderBar::paint(juce::Graphics& g) {
 }
 
 void HeaderBar::timerCallback() {
-  sheenPhase += 0.010;
+  sheenPhase += 0.012;
   if (sheenPhase > 1.55) sheenPhase = -0.55;
   repaint();
 }
