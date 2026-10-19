@@ -12,6 +12,10 @@
   part of the plugin's DNA — "Jerk Bounce" drums + "Jerk 808 Bounce" + "Jerk
   Hook" progression (im7-ivm7-VImaj7-V7); "Plugg Hats 16" drums + "Plugg Long"
   808 + "Plugg Bells" progression (im7-VImaj7-IIImaj7-VII); BoomBap as above.
+- **SampleFocus + busquedas rapidas** en el Sample Scout: nueva tienda
+  (samplefocus.com) y selector de busquedas rapidas por genero (JERK, Detroit,
+  Trap, Plugg, Hip-Hop, UK, Synth, Chords, Melodies) que abre la busqueda en la
+  tienda elegida.
 
 ### Notes
 - First release (`1.0.0`): full QA pass (0.6.1) + delivered-set content + docs.

@@ -16,8 +16,10 @@ MIDI** al Piano Roll y **arrastrar samples de tu disco** a la Playlist.
 - [x] **Character presets** (7): Detroit / Trap Oscuro / Plugg / Nu-Jerk / Boom Bap /
       Rage / Trap Latino — swing, jitter humano, velocity, ghost hats, 808 glides
       y aire melodico; calibrados con tus referencias (`REFERENCES.md`)
-- [x] **Sample Scout**: búsquedas en Splice / Freesound / Loopcloud / Samplette /
-      YouTube / SoundCloud (abre el navegador; el plugin nunca accede a internet)
+- [x] **Sample Scout**: búsquedas en Splice / Freesound / SampleFocus / Loopcloud /
+      Samplette / YouTube / SoundCloud + **búsquedas rápidas por género** (jerk,
+      detroit, trap, plugg, hiphop, uk, synth, chords, melodies); abre el navegador
+      (el plugin nunca accede a internet)
 - [x] **Navegador de samples local**: indexa tus carpetas en segundo plano,
       detecta BPM/key por nombre, filtros y **drag de audio directo a FL**
 - [x] **Co-Producer style (offline)**: BPM del proyecto + chip **FIT**, favoritos
@@ -150,6 +152,10 @@ y el plugin lo indexa solo (BPM/key por nombre, filtros, audicion, drag a FL).
 3. Plan free: 3 creditos de descarga cada lunes + extras por subir samples
    (4 por upload aprobado). Todos los sonidos son royalty-free sin atribucion
    (Standard License).
+
+Tip: en el **Sample Scout** del plugin tienes *busquedas rapidas* (JERK, Detroit,
+Trap, Plugg, Hip-Hop, UK, Synth, Chords, Melodies) que abren la busqueda en la
+tienda que elijas arriba (SampleFocus, Splice, Freesound...).
 
 ## Licencia / aviso
 

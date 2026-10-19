@@ -40,6 +40,7 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
 
   providerBox.addItem("Splice", 1);
   providerBox.addItem("Freesound", 2);
+  providerBox.addItem("SampleFocus", 7);
   providerBox.addItem("Loopcloud", 4);
   providerBox.addItem("Samplette", 3);
   providerBox.addItem("YouTube (referencias)", 5);
@@ -55,6 +56,26 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
     juce::URL(url).launchInDefaultBrowser();
   };
   addAndMakeVisible(openSearchButton);
+
+  quickLabel.setText("Busqueda rapida (abre en la tienda)", juce::dontSendNotification);
+  quickLabel.setFont(juce::Font(juce::FontOptions(11.0f)));
+  quickLabel.setColour(juce::Label::textColourId, Palette::textSecondary);
+  addAndMakeVisible(quickLabel);
+
+  const char* quickNames[] = {"JERK", "Detroit", "Trap", "Plugg", "Hip-Hop",
+                              "UK", "Synth", "Chords", "Melodies"};
+  for (int i = 0; i < 9; ++i) quickBox.addItem(quickNames[i], i + 1);
+  quickBox.setTextWhenNothingSelected("Elige una busqueda...");
+  quickBox.onChange = [this] {
+    static const char* terms[] = {"jerk", "detroit", "trap", "plugg", "hiphop",
+                                  "uk", "synth", "chords", "melodies"};
+    auto idx = quickBox.getSelectedId();
+    if (idx <= 0) return;
+    auto url = ChatEngine::buildSearchUrl(terms[idx - 1], providerBox.getSelectedId());
+    juce::URL(url).launchInDefaultBrowser();
+    quickBox.setSelectedId(0, juce::dontSendNotification);
+  };
+  addAndMakeVisible(quickBox);
 
   sendButton.setColour(juce::TextButton::buttonColourId, Palette::accent);
   sendButton.onClick = [this] { send(input.getText()); };
@@ -110,12 +131,15 @@ void ChatPanel::resized() {
   }
   r.removeFromTop(4);
 
-  auto bottom = r.removeFromBottom(84);
+  auto bottom = r.removeFromBottom(130);
   providerLabel.setBounds(bottom.removeFromTop(14));
   auto row2 = bottom.removeFromTop(26);
   openSearchButton.setBounds(row2.removeFromRight(112));
   row2.removeFromRight(6);
   providerBox.setBounds(row2);
+  bottom.removeFromTop(6);
+  quickLabel.setBounds(bottom.removeFromTop(14));
+  quickBox.setBounds(bottom.removeFromTop(26));
   bottom.removeFromTop(6);
   auto row3 = bottom.removeFromTop(28);
   sendButton.setBounds(row3.removeFromRight(70));

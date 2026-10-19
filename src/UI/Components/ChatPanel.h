@@ -33,6 +33,8 @@ private:
   juce::TextButton openSearchButton{"Abrir busqueda"};
   juce::ComboBox providerBox;
   juce::Label providerLabel;
+  juce::ComboBox quickBox;
+  juce::Label quickLabel;
   juce::String lastQuery;
   std::vector<std::unique_ptr<juce::TextButton>> chips;
 

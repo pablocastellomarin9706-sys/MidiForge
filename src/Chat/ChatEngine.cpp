@@ -369,7 +369,7 @@ ChatReply ChatEngine::handle(const juce::String& userText) {
     auto q = buildScoutQuery(s, idea);
     reply.searchQuery = q;
     reply.text = "He preparado la búsqueda: '" + q + "'\n"
-                 "Pulsa 'Abrir búsqueda' y elige fuente (Splice, Freesound, Loopcloud, Samplette, YouTube o SoundCloud).\n"
+                 "Pulsa 'Abrir busqueda' y elige fuente (Splice, Freesound, SampleFocus, Loopcloud, Samplette, YouTube o SoundCloud).\n"
                  "Nota Samplette: es un shuffle con filtros; usa Key = " + keyLabelOf(idea) +
                  " y estilo " + styleName(idea.style) + ".";
     return reply;
@@ -529,6 +529,7 @@ juce::String ChatEngine::buildSearchUrl(const juce::String& query, int provider)
     return "https://www.youtube.com/results?search_query=" +
            juce::URL::addEscapeChars(query.trim() + " type beat", true);
   if (provider == 6) return "https://soundcloud.com/search?q=" + escaped;
+  if (provider == 7) return "https://samplefocus.com/samples?search=" + escaped;
   return "https://samplette.io/";
 }
 
