@@ -425,7 +425,8 @@ juce::File fetchFreesoundSound(const juce::String& apiKey, SoundSlot slot,
       "&page_size=8&token=" + key;
 
   status = "Buscando en Freesound...";
-  auto stream = juce::URL(url).createInputStream(nullptr, 12000, {}, 10000);
+  auto stream = juce::URL(url).createInputStream(false, nullptr, nullptr, {}, nullptr,
+                                                 nullptr, 12000);
   if (stream == nullptr) {
     status = "Sin conexion con Freesound (revisa la key)";
     return {};
@@ -469,7 +470,8 @@ juce::File fetchFreesoundSound(const juce::String& apiKey, SoundSlot slot,
         juce::File::createLegalFileName(soundName) + "_" + juce::String(id) + ".mp3");
     file.deleteFile();
 
-    auto dl = juce::URL(hq).createInputStream(nullptr, 20000, {}, 12000);
+    auto dl = juce::URL(hq).createInputStream(false, nullptr, nullptr, {}, nullptr,
+                                              nullptr, 20000);
     if (dl == nullptr) continue;
     juce::MemoryBlock mb;
     dl->readIntoMemoryBlock(mb);
