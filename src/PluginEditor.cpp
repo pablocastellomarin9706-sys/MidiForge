@@ -4,7 +4,7 @@
 namespace MidiForge {
 
 MidiForgeAudioProcessorEditor::MidiForgeAudioProcessorEditor(MidiForgeAudioProcessor& p)
-  : AudioProcessorEditor(&p), processor(p)
+  : AudioProcessorEditor(&p), processor(p), tooltipWindow(this, 600)
 {
   setLookAndFeel(&lookAndFeel);
   mainComp = std::make_unique<MainComponent>(processor);

@@ -15,26 +15,22 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
 
   startTimerHz(20);
 
-  auto reroll = [this](bool newSeed) {
-    auto& idea = processor.getCurrentIdea();
-    if (newSeed) {
-      idea.seed = juce::Random::getSystemRandom().nextInt(1000000) + 1;
-      idea.take = 0;
-    } else {
-      idea.take += 1;
-    }
-    processor.generateFull();
-    refreshFromIdea();
-  };
+  // The animated anvil badge doubles as the main "forge" button.
+  mascot.onClick = [this] { forgeNewIdea(true); };
+  addAndMakeVisible(mascot);
+
   generateButton.setColour(juce::TextButton::buttonColourId, Palette::accent);
-  generateButton.onClick = [reroll] { reroll(true); };
+  generateButton.setTooltip("Forja una idea nueva (semilla nueva)");
+  generateButton.onClick = [this] { forgeNewIdea(true); };
   addAndMakeVisible(generateButton);
-  shuffleButton.onClick = [reroll] { reroll(false); };
+  shuffleButton.setTooltip("Otra variacion de la misma idea (misma semilla)");
+  shuffleButton.onClick = [this] { forgeNewIdea(false); };
   addAndMakeVisible(shuffleButton);
 
   chatButton.setClickingTogglesState(true);
   chatButton.setToggleState(true, juce::dontSendNotification);
   chatButton.setColour(juce::TextButton::buttonOnColourId, Palette::accent.darker(0.15f));
+  chatButton.setTooltip("Mostrar u ocultar el Forge Chat");
   chatButton.onClick = [this] { if (onChatToggle) onChatToggle(); };
   addAndMakeVisible(chatButton);
 
@@ -60,6 +56,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(keyBox);
+  keyBox.setTooltip("Tonalidad de la idea");
 
   for (int i = 0; i < 7; ++i) scaleBox.addItem(scaleNames[i], i + 1);
   scaleBox.onChange = [this] {
@@ -71,6 +68,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(scaleBox);
+  scaleBox.setTooltip("Escala o modo: la melodia nunca se sale de aqui");
 
   for (int i = 0; i < 6; ++i) styleBox.addItem(styleNames[i], i + 1);
   styleBox.onChange = [this] {
@@ -79,6 +77,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(styleBox);
+  styleBox.setTooltip("Genero: cambia grooves de bateria, lineas de bajo y motivos de melodia");
 
   barsSlider.setRange(1, 16, 1);
   barsSlider.setValue(4, juce::dontSendNotification);
@@ -90,6 +89,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(barsSlider);
+  barsSlider.setTooltip("Compases de la idea (1-16)");
 
   seedSlider.setRange(0, 999999, 1);
   seedSlider.setValue(12345, juce::dontSendNotification);
@@ -103,13 +103,22 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(seedSlider);
+  seedSlider.setTooltip("Semilla: la misma semilla reproduce la misma idea");
 
   swingSlider.setRange(0, 100, 1);
   swingSlider.setValue(0, juce::dontSendNotification);
   swingSlider.setSliderStyle(juce::Slider::LinearHorizontal);
   swingSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+  swingSlider.setTooltip("Swing del groove: se aplica al soltar el slider");
   swingSlider.onValueChange = [this] {
     processor.getCurrentIdea().swing = swingSlider.getValue();
+  };
+  // Regenerating on every pixel of drag would rebuild the idea dozens of times;
+  // doing it on release means the swing change is actually heard (it used to
+  // sit there until the next Shuffle, which read as "this slider does nothing").
+  swingSlider.onDragEnd = [this] {
+    processor.generateFull();
+    refreshFromIdea();
   };
   addAndMakeVisible(swingSlider);
 
@@ -123,6 +132,7 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(brightnessSlider);
+  brightnessSlider.setTooltip("Juice: voicings mas ricos (novenas) y notas con mas pegada");
 
   variationSlider.setRange(0, 100, 1);
   variationSlider.setValue(0, juce::dontSendNotification);
@@ -134,7 +144,21 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
     refreshFromIdea();
   };
   addAndMakeVisible(variationSlider);
+  variationSlider.setTooltip("Variacion: humanizacion extra (0 = cuadriculado)");
 
+  refreshFromIdea();
+}
+
+void HeaderBar::forgeNewIdea(bool newSeed) {
+  auto& idea = processor.getCurrentIdea();
+  if (newSeed) {
+    idea.seed = juce::Random::getSystemRandom().nextInt(1000000) + 1;
+    idea.take = 0;
+  } else {
+    idea.take += 1;
+  }
+  processor.generateFull();
+  mascot.strike(); // the anvil reacts to every new idea, however it was asked
   refreshFromIdea();
 }
 
@@ -200,50 +224,11 @@ void HeaderBar::paint(juce::Graphics& g) {
     g.fillRect(r.getX(), r.getBottom() - 1.5f, r.getWidth(), 1.5f);
   }
 
-  // Logo: chamfered molten badge holding a dark anvil, then the wordmark.
+  // Wordmark. The molten badge with the anvil is the ForgeMascot child, which
+  // animates (hammer + sparks) and forges a new idea when clicked.
   auto tb = titleLabel.getBounds();
   if (tb.getWidth() > 40) {
-    auto badge = juce::Rectangle<float>((float)tb.getX(), (float)tb.getCentreY() - 15.0f, 30.0f, 30.0f);
-
-    // Molten glow behind the badge.
-    g.setColour(Palette::accent.withAlpha(0.30f));
-    g.strokePath(chamferRect(badge.expanded(2.0f), 9.0f), juce::PathStrokeType(3.0f));
-
-    auto badgePath = chamferRect(badge, 8.0f);
-    g.setGradientFill(juce::ColourGradient(Palette::accentSoft, badge.getX(), badge.getY(),
-                                           Palette::hot, badge.getRight(), badge.getBottom(), false));
-    g.fillPath(badgePath);
-
-    // Hot top edge.
-    g.setColour(juce::Colours::white.withAlpha(0.35f));
-    g.drawHorizontalLine((int)badge.getY() + 2, badge.getX() + 8.0f, badge.getRight() - 8.0f);
-
-    // Dark anvil silhouette.
-    const float cx = badge.getCentreX(), cy = badge.getCentreY();
-    juce::Path anvil;
-    anvil.startNewSubPath(cx - 9.0f, cy - 6.5f);
-    anvil.lineTo(cx + 7.5f, cy - 6.5f);
-    anvil.lineTo(cx + 7.5f, cy - 2.5f);
-    anvil.lineTo(cx + 2.8f, cy - 2.5f);
-    anvil.lineTo(cx + 2.8f, cy + 2.5f);
-    anvil.lineTo(cx + 7.0f, cy + 2.5f);
-    anvil.lineTo(cx + 7.0f, cy + 6.5f);
-    anvil.lineTo(cx - 7.0f, cy + 6.5f);
-    anvil.lineTo(cx - 7.0f, cy + 2.5f);
-    anvil.lineTo(cx - 2.8f, cy + 2.5f);
-    anvil.lineTo(cx - 2.8f, cy - 2.5f);
-    anvil.lineTo(cx - 9.0f, cy - 2.5f);
-    anvil.closeSubPath();
-    g.setColour(Palette::background);
-    g.fillPath(anvil);
-
-    // Two warm sparks flying off the anvil.
-    g.setColour(Palette::accentSoft.withAlpha(0.95f));
-    g.fillEllipse(badge.getRight() - 6.0f, badge.getY() + 4.0f, 2.4f, 2.4f);
-    g.setColour(juce::Colours::white.withAlpha(0.85f));
-    g.fillEllipse(badge.getRight() - 2.5f, badge.getY() + 9.0f, 1.4f, 1.4f);
-
-    auto textArea = tb.withTrimmedLeft(40);
+    auto textArea = tb.withTrimmedLeft(44);
     juce::AttributedString as;
     as.append("Midi", juce::Font(juce::FontOptions(21.0f, juce::Font::bold)), Palette::textPrimary);
     as.append("Forge", juce::Font(juce::FontOptions(21.0f, juce::Font::bold)), Palette::accent);
@@ -270,7 +255,10 @@ void HeaderBar::resized() {
 
   {
     auto rr = row1;
-    titleLabel.setBounds(rr.removeFromLeft(140));
+    auto titleArea = rr.removeFromLeft(150);
+    titleLabel.setBounds(titleArea);
+    // Animated badge with a 3 px glow margin around the 34 px anvil.
+    mascot.setBounds(titleArea.getX() - 3, titleArea.getCentreY() - 20, 40, 40);
     rr.removeFromLeft(12);
     generateButton.setBounds(rr.removeFromLeft(110).reduced(0, 4));
     rr.removeFromLeft(8);

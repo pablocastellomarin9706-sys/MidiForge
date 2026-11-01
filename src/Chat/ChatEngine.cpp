@@ -530,7 +530,7 @@ juce::String ChatEngine::buildSearchUrl(const juce::String& query, int provider)
            juce::URL::addEscapeChars(query.trim() + " type beat", true);
   if (provider == 6) return "https://soundcloud.com/search?q=" + escaped;
   if (provider == 7) return "https://samplefocus.com/samples?search=" + escaped;
-  return "https://samplette.io/";
+  return "https://splice.com/sounds/search?q=" + escaped;
 }
 
 } // namespace MidiForge

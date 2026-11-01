@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.2.0 - 2026-11-01
+
+### Fixed
+- **Melodias fuera de escala**: las notas de frase se enganchaban a cualquier nota
+  del acorde, incluidos los colores prestados (bVII en mayor, V mayor en menor,
+  novenas con Juice alto), asi que el lead podia salirse de la escala elegida.
+  Ahora el enganche solo acepta notas del acorde que ademas estan en la escala, y
+  hay una red final que devuelve cualquier nota suelta a su grado mas cercano.
+- **Swing parecia roto**: el slider guardaba el valor pero no regeneraba la idea
+  (habia que pulsar Shuffle para oirlo). Ahora se aplica al soltar.
+
+### Added
+- **Variacion real por genero en bateria y bajo**: cada estilo tenia un unico
+  patron, asi que Shuffle no cambiaba nada. Ahora hay 3-4 grooves de bateria y
+  3-4 lineas de bajo por estilo (Pop, LoFi, House, HipHop, EDM, Rock).
+- **Bateria que respira**: los compases impares anaden toques del vocabulario del
+  genero (ghost snares, kicks sincopados, open hats, rims) y el ultimo compas trae
+  un fill propio (roll de trap, build de house/EDM, toms de rock, rim de lofi).
+  Las duraciones ahora tienen sentido (open hat y crash suenan, hats cortos).
+- **Bajo con movimiento**: saltos de octava del 808, bombeos de house, septimas
+  de lofi, quintas de rock y notas de aproximacion caminando al siguiente acorde.
+- **Motivos melodicos por estilo**: cada genero usa su propio conjunto de celulas
+  ritmicas, y la melodia recorre el conjunto compas a compas.
+- **Mascota animada de la forja** en la cabecera: yunque con martillo que golpea
+  solo y lanza chispas. Es interactiva: un clic forja una idea nueva y reacciona
+  a cada regeneracion.
+- **Tooltips** en los controles de cabecera, SONIDO, SAMPLES y el chat.
+
+### Removed
+- **Samplette** del selector de tiendas del chat: abria su web sin llevarse la
+  busqueda, asi que era un ajuste enganoso.
+
+### Notes
+- Los acordes pueden seguir usando color prestado de forma intencionada (bVII en
+  mayor, V mayor en menor): es armonia correcta. La melodia, sin embargo, ya no
+  se sale nunca de la escala que eliges.
+
 ## 1.1.0 - 2026-10-19
 
 ### Added

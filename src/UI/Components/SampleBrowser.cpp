@@ -172,15 +172,19 @@ SampleBrowser::SampleBrowser(MidiForgeAudioProcessor& p)
   addAndMakeVisible(keyBox);
 
   addFolderButton.setColour(juce::TextButton::buttonColourId, Palette::card);
+  addFolderButton.setTooltip("Anade una carpeta de samples al indice");
   addFolderButton.onClick = [this] { addFolder(); };
   addAndMakeVisible(addFolderButton);
 
   rescanButton.setColour(juce::TextButton::buttonColourId, Palette::card);
+  rescanButton.setTooltip("Vuelve a indexar las carpetas (tras anadir o mover archivos)");
   rescanButton.onClick = [this] { processor.getSampleLibrary().rescan(); };
   addAndMakeVisible(rescanButton);
 
   fitButton.setClickingTogglesState(true);
   fitButton.setColour(juce::TextButton::buttonOnColourId, Palette::accent);
+  fitButton.setTooltip("Solo samples que encajan en tempo y tonalidad del proyecto "
+                       "(dale al play en FL para que lea el BPM)");
   fitButton.onClick = [this] {
     fitMode = fitButton.getToggleState();
     rebuildFilter();
@@ -189,6 +193,7 @@ SampleBrowser::SampleBrowser(MidiForgeAudioProcessor& p)
 
   favButton.setClickingTogglesState(true);
   favButton.setColour(juce::TextButton::buttonOnColourId, Palette::star.darker(0.30f));
+  favButton.setTooltip("Solo favoritos (se marcan con la estrella de cada fila)");
   favButton.onClick = [this] {
     favMode = favButton.getToggleState();
     rebuildFilter();

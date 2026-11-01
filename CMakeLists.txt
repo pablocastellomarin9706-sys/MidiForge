@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 1.1.0
+  VERSION 1.2.0
   LANGUAGES CXX
 )
 
@@ -82,6 +82,8 @@ target_sources(MidiForge
     src/UI/MainComponent.h
     src/UI/Components/HeaderBar.cpp
     src/UI/Components/HeaderBar.h
+    src/UI/Components/ForgeMascot.cpp
+    src/UI/Components/ForgeMascot.h
     src/UI/Components/Sidebar.cpp
     src/UI/Components/Sidebar.h
     src/UI/Components/TabView.cpp

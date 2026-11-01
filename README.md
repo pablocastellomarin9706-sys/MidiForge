@@ -18,7 +18,7 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
       Rage / Trap Latino — swing, jitter humano, velocity, ghost hats, 808 glides
       y aire melodico; calibrados con tus referencias (`REFERENCES.md`)
 - [x] **Sample Scout**: búsquedas en Splice / Freesound / SampleFocus / Loopcloud /
-      Samplette / YouTube / SoundCloud + **búsquedas rápidas por género** (jerk,
+      YouTube / SoundCloud + **búsquedas rápidas por género** (jerk,
       detroit, trap, plugg, hiphop, uk, synth, chords, melodies); abre el navegador
 - [x] **Navegador de samples local**: indexa tus carpetas en segundo plano,
       detecta BPM/key por nombre, filtros y **drag de audio directo a FL**
@@ -32,6 +32,14 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
       progresiones propios (mismos grooves que los .mid de `MidiForge_Entregas`)
 - [x] **Auto-Sound (SONIDO)** + **Freesound API** (opcional, con tu key gratis):
       sonido automático por capa, renders WAV y descarga CC0 al vuelo
+- [x] **Melodía siempre en escala** (v1.2): las notas se enganchan solo a notas del
+      acorde que además pertenecen a la escala elegida; ninguna nota queda fuera
+- [x] **Batería y bajo por género de verdad** (v1.2): 3-4 grooves y 3-4 líneas por
+      estilo, variación en los compases impares, fills propios del género (trap roll,
+      build de house/EDM, toms de rock) y motivos melódicos por estilo
+- [x] **Mascota animada de la forja** (v1.2): yunque + martillo que golpea solo y
+      salta chispas; se puede pulsar para forjar una idea nueva. Tooltips en todos
+      los controles
 - [ ] Mini editor de piano roll editable (fase siguiente)
 
 ## Requisitos (para compilar)

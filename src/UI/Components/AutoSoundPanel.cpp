@@ -93,6 +93,7 @@ AutoSoundPanel::AutoSoundPanel(MidiForgeAudioProcessor& p) : processor(p) {
 
   rerollAllButton = makeButton("Variar todo");
   rerollAllButton->setColour(juce::TextButton::buttonColourId, Palette::accentDim);
+  rerollAllButton->setTooltip("Cambia los sonidos de todas las capas a la vez");
   rerollAllButton->onClick = [this] {
     processor.pickAutoSoundsForIdea();
     lastStatus = "Combinacion completa nueva.";
@@ -122,9 +123,11 @@ AutoSoundPanel::AutoSoundPanel(MidiForgeAudioProcessor& p) : processor(p) {
   keyEditor->setColour(juce::TextEditor::outlineColourId, Palette::border);
   keyEditor->setColour(juce::TextEditor::textColourId, Palette::textPrimary);
   keyEditor->setFont(juce::Font(juce::FontOptions(11.0f)));
+  keyEditor->setTooltip("API key gratuita de freesound.org/apiv2/apply; se guarda solo en tu equipo");
   addAndMakeVisible(*keyEditor);
 
   saveKeyButton = makeButton("Guardar");
+  saveKeyButton->setTooltip("Guarda la key para poder descargar previews CC0");
   saveKeyButton->onClick = [this] {
     processor.setFreesoundKey(keyEditor->getText());
     lastStatus = processor.getFreesoundKey().isEmpty()
@@ -178,6 +181,10 @@ AutoSoundPanel::AutoSoundPanel(MidiForgeAudioProcessor& p) : processor(p) {
       row->onlineButton = makeButton("Freesound");
       row->webButton = makeButton("Web");
       row->playButton = makeButton("Escuchar");
+      row->rerollButton->setTooltip("Otro sonido para esta capa (de tus packs)");
+      row->onlineButton->setTooltip("Descarga un preview CC0 de Freesound (necesita API key)");
+      row->webButton->setTooltip("Abre SampleFocus con la busqueda del genero");
+      row->playButton->setTooltip("Renderiza y reproduce esta capa con su sonido");
       row->rerollButton->onClick = [this, rp = row.get()] { applyReroll(*rp); };
       row->onlineButton->onClick = [this, rp = row.get()] { applyOnline(*rp); };
       row->webButton->onClick = [this, rp = row.get()] { applyWeb(*rp); };
@@ -194,10 +201,13 @@ AutoSoundPanel::AutoSoundPanel(MidiForgeAudioProcessor& p) : processor(p) {
     } else if (sd.kind == kDrums) {
       row->rerollButton = makeButton("Otro");
       row->playButton = makeButton("Escuchar");
+      row->rerollButton->setTooltip("Elige otro kit de bateria (siempre de tus packs)");
+      row->playButton->setTooltip("Renderiza y reproduce la bateria con el kit elegido");
       row->rerollButton->onClick = [this, rp = row.get()] { applyReroll(*rp); };
       row->playButton->onClick = [this, rp = row.get()] { applyPlay(*rp); };
     } else {
       row->playButton = makeButton("Escuchar");
+      row->playButton->setTooltip("Renderiza y reproduce la idea completa con sus sonidos");
       row->playButton->onClick = [this, rp = row.get()] { applyPlay(*rp); };
     }
 

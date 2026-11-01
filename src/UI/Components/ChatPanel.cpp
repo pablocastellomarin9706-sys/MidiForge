@@ -42,14 +42,15 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
   providerBox.addItem("Freesound", 2);
   providerBox.addItem("SampleFocus", 7);
   providerBox.addItem("Loopcloud", 4);
-  providerBox.addItem("Samplette", 3);
   providerBox.addItem("YouTube (referencias)", 5);
   providerBox.addItem("SoundCloud (referencias)", 6);
   providerBox.setSelectedId(1, juce::dontSendNotification);
+  providerBox.setTooltip("Web donde se abrira la busqueda de samples");
   addAndMakeVisible(providerBox);
 
   openSearchButton.setEnabled(false);
   openSearchButton.setColour(juce::TextButton::buttonColourId, Palette::card);
+  openSearchButton.setTooltip("Abre la ultima busqueda que pidio el chat (se activa al buscar)");
   openSearchButton.onClick = [this] {
     if (lastQuery.isEmpty()) return;
     auto url = ChatEngine::buildSearchUrl(lastQuery, providerBox.getSelectedId());
@@ -66,6 +67,7 @@ ChatPanel::ChatPanel(MidiForgeAudioProcessor& p) : processor(p), engine(p) {
                               "UK", "Synth", "Chords", "Melodies"};
   for (int i = 0; i < 9; ++i) quickBox.addItem(quickNames[i], i + 1);
   quickBox.setTextWhenNothingSelected("Elige una busqueda...");
+  quickBox.setTooltip("Busquedas rapidas por genero: se abren en la tienda elegida");
   quickBox.onChange = [this] {
     static const char* terms[] = {"jerk", "detroit", "trap", "plugg", "hiphop",
                                   "uk", "synth", "chords", "melodies"};

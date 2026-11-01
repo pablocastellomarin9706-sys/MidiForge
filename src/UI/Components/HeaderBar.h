@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "../../PluginProcessor.h"
+#include "ForgeMascot.h"
 
 namespace MidiForge {
 
@@ -17,8 +18,10 @@ public:
 
 private:
   void timerCallback() override;
+  void forgeNewIdea(bool newSeed);
 
   MidiForgeAudioProcessor& processor;
+  ForgeMascot mascot;
   juce::TextButton generateButton{"GENERATE"};
   juce::TextButton shuffleButton{"Shuffle"};
   juce::TextButton chatButton{"Chat"};

@@ -19,6 +19,8 @@ private:
   MidiForgeAudioProcessor& processor;
   std::unique_ptr<MainComponent> mainComp;
   MidiForgeLookAndFeel lookAndFeel;
+  // Makes the control tooltips (header, SONIDO, SAMPLES, chat) actually show up.
+  juce::TooltipWindow tooltipWindow;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiForgeAudioProcessorEditor)
 };
 
