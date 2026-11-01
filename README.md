@@ -54,6 +54,9 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
       Replace y cambios de parametros
 - [x] **Progresion propia para la seccion B** (v1.5): acordes, melodia y bajo
       cambian de verdad en la segunda mitad de las ideas de 8+ compases
+- [x] **Stems WAV + MIDI** (v1.6): boton en SONIDO; guarda los 4 stems y el MIDI
+      en `Musica/MidiForge/Export_fecha_hora`
+- [x] **Marca de seccion B** (v1.6) en el piano roll
 - [ ] Editor de arreglo A/B a la vista (marcar compases y secciones)
 - [ ] Undo visible y multi-nivel por track (ademas de Ctrl+Z)
 

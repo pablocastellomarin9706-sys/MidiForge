@@ -32,12 +32,14 @@ private:
   void applyWeb(Row& r);
   void applyPlay(Row& r);
   juce::File loopFileFor(const Row& r) const;
+  void exportStems();
 
   MidiForgeAudioProcessor& processor;
   std::vector<std::unique_ptr<Row>> rows;
   std::unique_ptr<juce::Label> titleLabel;
   std::unique_ptr<juce::Label> subtitleLabel;
   std::unique_ptr<juce::TextButton> rerollAllButton;
+  std::unique_ptr<juce::TextButton> stemsButton;
   std::unique_ptr<juce::Label> rerollHintLabel;
   std::unique_ptr<juce::Label> keyLabel;
   std::unique_ptr<juce::TextEditor> keyEditor;

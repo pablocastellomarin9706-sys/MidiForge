@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.0 - 2026-11-01
+
+### Added
+- **Stems WAV + MIDI**: boton en la pestana SONIDO que renderiza los cuatro stems
+  con los sonidos Auto-Sound actuales y guarda el MIDI completo en
+  `Musica/MidiForge/Export_fecha_hora`, listo para compartir o subir.
+- **Marca de seccion B en el piano roll**: linea y etiqueta B a la mitad de las
+  ideas de 8+ compases, a juego con la progresion y el groove propios de la B.
+
 ## 1.5.0 - 2026-11-01
 
 ### Added

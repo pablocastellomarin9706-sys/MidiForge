@@ -195,6 +195,19 @@ void PianoRollMini::paint(juce::Graphics& g) {
       g.drawRoundedRectangle(nr.expanded(0.8f), 2.5f, 1.2f);
     }
   }
+
+  // A/B arrangement: 8+ bar ideas switch progression and motif at the halfway
+  // point, so the roll marks the boundary.
+  const double bBeat = (double)(bars / 2) * 4.0;
+  if (bars >= 8 && bBeat < L.maxBeat) {
+    const float xb = L.xForBeat(bBeat);
+    g.setColour(Palette::accent.withAlpha(0.60f));
+    g.drawVerticalLine((int)xb, area.getY(), area.getBottom());
+    g.setColour(Palette::accentSoft);
+    g.setFont(juce::Font(juce::FontOptions(9.5f, juce::Font::bold)));
+    g.drawText("B", juce::Rectangle<float>(xb + 3.0f, area.getY() + 2.0f, 14.0f, 12.0f),
+               juce::Justification::centredLeft);
+  }
 }
 
 void PianoRollMini::mouseDown(const juce::MouseEvent& e) {

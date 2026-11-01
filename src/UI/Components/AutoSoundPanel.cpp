@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "../LookAndFeel.h"
+#include "../../MIDI/MidiBuilder.h"
 
 namespace MidiForge {
 
@@ -99,6 +100,13 @@ AutoSoundPanel::AutoSoundPanel(MidiForgeAudioProcessor& p) : processor(p) {
     lastStatus = "Combinacion completa nueva.";
     refresh();
   };
+
+  stemsButton = makeButton("Stems WAV");
+  stemsButton->setColour(juce::TextButton::buttonColourId, Palette::accentDim);
+  stemsButton->setTooltip(
+      "Exporta 4 stems WAV + el MIDI a Musica/MidiForge, con los sonidos "
+      "Auto-Sound actuales");
+  stemsButton->onClick = [this] { exportStems(); };
 
   rerollHintLabel = std::make_unique<juce::Label>();
   rerollHintLabel->setText("Otro cambia una capa; esto cambia todas.",
@@ -241,6 +249,8 @@ void AutoSoundPanel::resized() {
     auto line = r.removeFromTop(26);
     rerollAllButton->setBounds(line.removeFromLeft(108));
     line.removeFromLeft(10);
+    stemsButton->setBounds(line.removeFromRight(92));
+    line.removeFromRight(8);
     rerollHintLabel->setBounds(line);
   }
   r.removeFromTop(6);
@@ -421,6 +431,35 @@ void AutoSoundPanel::applyPlay(Row& r) {
 juce::File AutoSoundPanel::loopFileFor(const Row& r) const {
   if (r.kind == kMix) return processor.renderMixAudio();
   return processor.renderTrackAudio(r.trackName);
+}
+
+void AutoSoundPanel::exportStems() {
+  auto& idea = processor.getCurrentIdea();
+  const auto dir = juce::File::getSpecialLocation(juce::File::userMusicDirectory)
+                       .getChildFile("MidiForge")
+                       .getChildFile("Export_" +
+                                     juce::Time::getCurrentTime().formatted("%Y%m%d_%H%M%S"));
+  if (!dir.createDirectory()) {
+    lastStatus = "No se pudo crear la carpeta de exportacion.";
+    refresh();
+    return;
+  }
+
+  int wavs = 0;
+  for (const auto& t : idea.tracks) {
+    if (t.notes.empty()) continue;
+    auto wav = processor.renderTrackAudio(t.name);
+    if (wav.existsAsFile() && wav.copyFileTo(dir.getChildFile(wav.getFileName())))
+      ++wavs;
+  }
+
+  auto mf = MidiBuilder::build(idea);
+  auto midiFile = dir.getChildFile("MidiForge.mid");
+  if (auto stream = midiFile.createOutputStream()) mf.writeTo(*stream);
+
+  lastStatus = "Exportado en Musica/MidiForge: " + juce::String(wavs) +
+               " stems + MIDI (" + dir.getFileName() + ")";
+  refresh();
 }
 
 } // namespace MidiForge
