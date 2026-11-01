@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0 - 2026-11-01
+
+### Added
+- **Progresion propia para la seccion B**: en ideas de 8+ compases la segunda
+  mitad usa otra progresion de la misma familia (elegida sin alterar el resto de
+  picks), asi que acordes, melodia y bajo cambian de verdad en la B. El detalle
+  del track muestra "B: ...".
+- **Pintar arrastrando en el grid de bateria**: el primer clic decide si el
+  trazo activa o quita golpes; al arrastrar se aplica a todas las celdas que
+  pasas. **Ctrl+Z** deshace el trazo completo (24 niveles).
+- El grid muestra el compas actual con pestanas y marca en ambar la seccion B.
+
 ## 1.4.0 - 2026-11-01
 
 ### Added

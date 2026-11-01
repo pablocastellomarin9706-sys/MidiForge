@@ -49,15 +49,18 @@ juce::Rectangle<float> DrumGrid::gridArea() const {
 }
 
 void DrumGrid::setTrack(TrackIdea* t, int barCount, bool canEdit) {
+  if (t != track) undoStack.clear();
   track = t;
   bars = juce::jmax(1, barCount);
   editable = canEdit;
   currentBar = juce::jlimit(0, bars - 1, currentBar);
+  setWantsKeyboardFocus(editable);
   setMouseCursor(editable ? juce::MouseCursor::PointingHandCursor
                           : juce::MouseCursor::NormalCursor);
-  setTooltip(editable ? "Clic en una celda para activar o quitar el golpe. "
+  setTooltip(editable ? "Clic o arrastra para activar/quitar golpes. Ctrl+Z deshace. "
                         "Las pestanas numeradas cambian de compas."
                       : "");
+  painting = false;
   repaint();
 }
 
@@ -193,39 +196,67 @@ bool DrumGrid::cellAt(juce::Point<float> pos, int& lane, int& step) const {
   return true;
 }
 
-void DrumGrid::toggleCell(int lane, int step) {
+void DrumGrid::pushUndo() {
   if (track == nullptr) return;
+  undoStack.push_back(track->notes);
+  if (undoStack.size() > 24) undoStack.erase(undoStack.begin());
+}
+
+void DrumGrid::undo() {
+  if (track == nullptr || undoStack.empty()) return;
+  track->notes = undoStack.back();
+  undoStack.pop_back();
+  track->edited = true;
+  if (onEdited) onEdited();
+  repaint();
+}
+
+bool DrumGrid::cellHasHit(int lane, int step) const {
+  if (track == nullptr) return false;
+  const auto& L = laneDef(lane);
+  const double barStart = (double)currentBar * 4.0;
+  for (const auto& n : track->notes) {
+    if (n.pitch != L.pitch || n.start < barStart || n.start >= barStart + 4.0) continue;
+    int s = (int)std::floor((n.start - barStart) / 0.25 + 0.5);
+    s = juce::jlimit(0, kSteps - 1, s);
+    if (s == step) return true;
+  }
+  return false;
+}
+
+bool DrumGrid::applyCell(int lane, int step, bool add) {
+  if (track == nullptr) return false;
   const auto& L = laneDef(lane);
   const double barStart = (double)currentBar * 4.0;
   auto& notes = track->notes;
 
-  bool removed = false;
-  for (auto it = notes.begin(); it != notes.end(); ) {
-    if (it->pitch == L.pitch && it->start >= barStart && it->start < barStart + 4.0) {
-      int s = (int)std::floor((it->start - barStart) / 0.25 + 0.5);
-      s = juce::jlimit(0, kSteps - 1, s);
-      if (s == step) {
-        it = notes.erase(it);
-        removed = true;
-        continue;
+  if (!add) {
+    bool removed = false;
+    for (auto it = notes.begin(); it != notes.end(); ) {
+      if (it->pitch == L.pitch && it->start >= barStart && it->start < barStart + 4.0) {
+        int s = (int)std::floor((it->start - barStart) / 0.25 + 0.5);
+        s = juce::jlimit(0, kSteps - 1, s);
+        if (s == step) {
+          it = notes.erase(it);
+          removed = true;
+          continue;
+        }
       }
+      ++it;
     }
-    ++it;
+    return removed;
   }
 
-  if (!removed) {
-    Note n{};
-    n.pitch = L.pitch;
-    n.start = barStart + (double)step * 0.25;
-    n.length = L.length;
-    n.velocity = L.velocity;
-    n.channel = track->channel;
-    notes.push_back(n);
-  }
+  if (cellHasHit(lane, step)) return false;
 
-  track->edited = true;
-  if (onEdited) onEdited();
-  repaint();
+  Note n{};
+  n.pitch = L.pitch;
+  n.start = barStart + (double)step * 0.25;
+  n.length = L.length;
+  n.velocity = L.velocity;
+  n.channel = track->channel;
+  notes.push_back(n);
+  return true;
 }
 
 void DrumGrid::mouseDown(const juce::MouseEvent& e) {
@@ -241,8 +272,61 @@ void DrumGrid::mouseDown(const juce::MouseEvent& e) {
   if (!editable) return;
 
   int lane = 0, step = 0;
-  if (cellAt(e.position, lane, step))
-    toggleCell(lane, step);
+  if (!cellAt(e.position, lane, step)) return;
+
+  grabKeyboardFocus();
+  pushUndo();
+  paintAdd = !cellHasHit(lane, step);
+  painting = true;
+  dragChanged = false;
+  lastLane = lane;
+  lastStep = step;
+
+  if (applyCell(lane, step, paintAdd)) {
+    dragChanged = true;
+    track->edited = true;
+    repaint();
+  }
+}
+
+void DrumGrid::mouseDrag(const juce::MouseEvent& e) {
+  if (!painting || track == nullptr) return;
+
+  int lane = 0, step = 0;
+  if (!cellAt(e.position, lane, step)) return;
+  if (lane == lastLane && step == lastStep) return;
+
+  lastLane = lane;
+  lastStep = step;
+  if (applyCell(lane, step, paintAdd)) {
+    dragChanged = true;
+    track->edited = true;
+    repaint();
+  }
+}
+
+void DrumGrid::mouseUp(const juce::MouseEvent&) {
+  if (!painting) return;
+  painting = false;
+  lastLane = -1;
+  lastStep = -1;
+  if (dragChanged) {
+    if (onEdited) onEdited();
+  } else if (!undoStack.empty()) {
+    undoStack.pop_back(); // nothing actually changed: drop the snapshot
+  }
+  dragChanged = false;
+}
+
+bool DrumGrid::keyPressed(const juce::KeyPress& k) {
+  if (k.getModifiers().isCommandDown()) {
+    const auto ch = k.getTextCharacter();
+    if (ch == 'z' || ch == 'Z') {
+      undo();
+      return true;
+    }
+  }
+  return false;
 }
 
 } // namespace MidiForge

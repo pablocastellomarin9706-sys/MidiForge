@@ -14,6 +14,11 @@ void ChordGenerator::generate(SessionIdea& idea, RandomGen& rng) {
   t.channel = 1;
   t.colour = juce::Colour(124, 92, 255);
   t.detail = idea.progressionDisplay + "  -  " + idea.progressionName;
+  if (idea.progressionIdxB >= 0 &&
+      idea.progressionIdxB < (int)Content::allProgressions().size()) {
+    const auto& B = Content::allProgressions()[(size_t)idea.progressionIdxB];
+    t.detail += "  /  B: " + B.display;
+  }
   if (idea.strictScale) t.detail += "  ·  estricto";
 
   auto rhythm = Content::chordRhythmFor(idea.style);

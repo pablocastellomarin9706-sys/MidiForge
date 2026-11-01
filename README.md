@@ -46,13 +46,16 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
 - [x] **Seccion B + fills cada 4 compases** (v1.3) y **glide de 808** por solape de
       notas para que el portamento haga el slide
 - [x] **Grid de bateria editable** (v1.4): 16 pasos por compas, 10 lanes, pestanas
-      por compas y clic para activar/quitar; se guarda con el proyecto
+      por compas y clic/arrastre para activar o quitar; Ctrl+Z y se guarda con el
+      proyecto
 - [x] **Modo DIATONICO** (v1.4): acordes y bajo sin notas fuera de la escala; con
       pentatonica/blues la armonia usa su escala madre
 - [x] **Bloqueo por track (BLOQ)** (v1.4): protege un track de GENERATE, Shuffle,
       Replace y cambios de parametros
-- [ ] Progresiones propias para la seccion B y editor de arreglo A/B a la vista
-- [ ] Undo visible y multi-nivel por track
+- [x] **Progresion propia para la seccion B** (v1.5): acordes, melodia y bajo
+      cambian de verdad en la segunda mitad de las ideas de 8+ compases
+- [ ] Editor de arreglo A/B a la vista (marcar compases y secciones)
+- [ ] Undo visible y multi-nivel por track (ademas de Ctrl+Z)
 
 ## Requisitos (para compilar)
 

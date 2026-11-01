@@ -150,6 +150,10 @@ std::vector<RealizedChord> realizeProgression(const SessionIdea& idea) {
   const auto& progs = allProgressions();
   if (idea.progressionIdx < 0 || idea.progressionIdx >= (int)progs.size()) return out;
   const auto& prog = progs[(size_t)idea.progressionIdx];
+  const auto& progB = (idea.bars >= 8 && idea.progressionIdxB >= 0 &&
+                       idea.progressionIdxB < (int)progs.size())
+                          ? progs[(size_t)idea.progressionIdxB]
+                          : prog;
 
   // Strict scale mode: chords are built from the chosen scale (stacked scale
   // thirds) and borrowed roots/qualities are ignored. Pentatonic and blues use
@@ -173,15 +177,20 @@ std::vector<RealizedChord> realizeProgression(const SessionIdea& idea) {
   int bars = idea.bars > 0 ? idea.bars : 4;
   std::vector<int> prev;
   for (int bar = 0; bar < bars; ++bar) {
-    const auto& s = prog.chords[(size_t)bar % prog.chords.size()];
-    int semi = MusicTheory::degreeToSemitone(chordScale, s.degree) + (strict ? 0 : s.rootOffset);
+    // 8+ bar ideas: the B half gets its own progression, so the arrangement
+    // moves instead of repeating the same four bars.
+    const bool useB = (bars >= 8 && bar >= bars / 2);
+    const auto& active = useB ? progB : prog;
+    const auto& s = active.chords[(size_t)bar % active.chords.size()];
+    int semi = MusicTheory::degreeToSemitone(strict ? chordScale : active.scale, s.degree) +
+               (strict ? 0 : s.rootOffset);
     int rootMidi = 48 + idea.keyRoot + semi;
     // Keep roots in a singable C3-B3-ish band, then voice around it.
     while (rootMidi < 43) rootMidi += 12;
     while (rootMidi > 55) rootMidi -= 12;
     auto intervals = strict
         ? strictDiatonicChord(chordPcs, s.degree, s.seventh)
-        : MusicTheory::triadIntervals(prog.scale, s.degree, s.quality, s.seventh);
+        : MusicTheory::triadIntervals(active.scale, s.degree, s.quality, s.seventh);
     // Bright/juicy: add the 9th on non-diminished chords when brightness is high.
     {
       bool h3 = false, h6 = false, h7 = false;

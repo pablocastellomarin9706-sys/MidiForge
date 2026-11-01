@@ -158,6 +158,16 @@ void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
   idea.progressionDisplay = P.display;
   idea.progressionName = P.name;
 
+  // B section (8+ bars): a second progression from the same family. Picked
+  // deterministically (the next candidate) so it never shifts the other picks.
+  idea.progressionIdxB = -1;
+  if (idea.bars >= 8 && progs.size() > 1) {
+    size_t pos = 0;
+    for (size_t i = 0; i < progs.size(); ++i)
+      if (progs[i] == idea.progressionIdx) { pos = i; break; }
+    idea.progressionIdxB = progs[(pos + 1) % progs.size()];
+  }
+
   auto drums = Content::drumIndicesFor(idea.style, idea.character);
   idea.drumPatternIdx = drums[(size_t)rng.nextInt(0, (int)drums.size() - 1)];
   idea.drumPatternName = Content::allDrumPatterns()[(size_t)idea.drumPatternIdx].name;
@@ -216,6 +226,8 @@ void IdeaGenerator::generateFromSaved(SessionIdea& idea) {
   bool idsOk = true;
   if (idea.progressionIdx < 0 || idea.progressionIdx >= (int)Content::allProgressions().size())
     idsOk = false;
+  if (idea.progressionIdxB >= (int)Content::allProgressions().size())
+    idsOk = false;
   if (idea.drumPatternIdx < 0 || idea.drumPatternIdx >= (int)Content::allDrumPatterns().size())
     idsOk = false;
   if (idea.bassPatternIdx < 0 || idea.bassPatternIdx >= (int)Content::allBassPatterns().size())
@@ -260,6 +272,10 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     const auto& P = Content::allProgressions()[(size_t)idea.progressionIdx];
     idea.progressionDisplay = P.display;
     idea.progressionName = P.name;
+    if (idea.bars >= 8 && progs.size() > 1)
+      idea.progressionIdxB = pickDifferent(progs, idea.progressionIdx, rng);
+    else
+      idea.progressionIdxB = -1;
     ChordGenerator cg; cg.generate(idea, rng);
     // Bass follows chord roots, so refresh it to stay in key. Also re-pick the
     // 808/pattern if the persisted one belongs to another style or character.

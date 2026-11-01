@@ -116,6 +116,7 @@ struct SessionIdea {
   float creativity{0.0f}; // 0-1 "Variacion": extra deterministic humanisation after generation
   // Curated content selection (drives Replace). -1 = not yet chosen.
   int progressionIdx{-1};
+  int progressionIdxB{-1}; // second progression for the B half (8+ bars)
   int drumPatternIdx{-1};
   int bassPatternIdx{-1};
   int melodyMotifIdx{-1};

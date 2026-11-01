@@ -22,17 +22,30 @@ public:
 
 private:
   void mouseDown(const juce::MouseEvent&) override;
+  void mouseDrag(const juce::MouseEvent&) override;
+  void mouseUp(const juce::MouseEvent&) override;
+  bool keyPressed(const juce::KeyPress&) override;
 
   juce::Rectangle<float> gridArea() const;
   juce::Rectangle<float> tabsArea() const;
   int barTabAt(juce::Point<float> pos) const;
   bool cellAt(juce::Point<float> pos, int& lane, int& step) const;
-  void toggleCell(int lane, int step);
+  bool cellHasHit(int lane, int step) const;
+  bool applyCell(int lane, int step, bool add);
+  void pushUndo();
+  void undo();
 
   TrackIdea* track{nullptr};
   int bars{4};
   int currentBar{0};
   bool editable{true};
+
+  bool painting{false};
+  bool paintAdd{false};
+  bool dragChanged{false};
+  int lastLane{-1};
+  int lastStep{-1};
+  std::vector<std::vector<Note>> undoStack;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DrumGrid)
 };

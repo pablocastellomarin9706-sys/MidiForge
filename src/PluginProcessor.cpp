@@ -101,6 +101,7 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   xml.setAttribute("creativity", (double)idea.creativity);
   xml.setAttribute("regen", regenCounter);
   xml.setAttribute("progIdx", idea.progressionIdx);
+  xml.setAttribute("progIdxB", idea.progressionIdxB);
   xml.setAttribute("drumIdx", idea.drumPatternIdx);
   xml.setAttribute("bassIdx", idea.bassPatternIdx);
   xml.setAttribute("motifIdx", idea.melodyMotifIdx);
@@ -167,6 +168,7 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   idea.creativity = (float)juce::jlimit(0.0, 1.0, xml->getDoubleAttribute("creativity", 0.0));
   regenCounter = xml->getIntAttribute("regen", 0);
   idea.progressionIdx = xml->getIntAttribute("progIdx", -1);
+  idea.progressionIdxB = xml->getIntAttribute("progIdxB", -1);
   idea.drumPatternIdx = xml->getIntAttribute("drumIdx", -1);
   idea.bassPatternIdx = xml->getIntAttribute("bassIdx", -1);
   idea.melodyMotifIdx = xml->getIntAttribute("motifIdx", -1);
