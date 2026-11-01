@@ -1,5 +1,8 @@
 name: build-vst3
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ main, master ]
@@ -83,3 +86,41 @@ jobs:
           name: MidiForge-vst3
           path: ${{ steps.locate.outputs.path }}
           if-no-files-found: error
+
+      - name: Read version
+        id: version
+        shell: pwsh
+        run: |
+          $m = Select-String -Path CMakeLists.txt -Pattern 'VERSION\s+(\d+\.\d+\.\d+)' | Select-Object -First 1
+          if (-not $m) { throw "Version not found in CMakeLists.txt" }
+          $v = $m.Matches[0].Groups[1].Value
+          Write-Host "MidiForge version: $v"
+          echo "value=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Package release ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "${{ steps.locate.outputs.path }}" `
+                           -DestinationPath "MidiForge-${{ steps.version.outputs.value }}-vst3.zip" -Force
+
+      # Publishing a release makes the build downloadable WITHOUT a GitHub login,
+      # which is much friendlier than the Actions artifact page. The tag is
+      # derived from CMakeLists so a version bump = a new release automatically.
+      - name: Publish release
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ github.token }}
+          tag_name: v${{ steps.version.outputs.value }}
+          name: MidiForge v${{ steps.version.outputs.value }}
+          body: |
+            Build automatico de MidiForge v${{ steps.version.outputs.value }} (VST3, Windows x64).
+
+            **Instalar / actualizar:** cierra FL Studio, descomprime el ZIP y copia
+            `MidiForge.vst3` a `C:\Program Files\Common Files\VST3\` (sustituye la
+            version anterior). Despues abre FL y, si hace falta, Options ->
+            Manage plugins -> Find more plugins.
+
+            Cambios de esta version: ver CHANGELOG.md en el repositorio.
+          files: MidiForge-${{ steps.version.outputs.value }}-vst3.zip
+          make_latest: true
