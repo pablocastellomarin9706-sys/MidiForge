@@ -10,7 +10,9 @@ namespace MidiForge {
 // Animated forge mascot: a molten badge with an anvil and a hammer that strikes
 // on its own and throws sparks. Clicking it forges a new idea (same as
 // GENERATE). It only repaints its own small area, so the animation is cheap.
-class ForgeMascot : public juce::Component, private juce::Timer {
+class ForgeMascot : public juce::Component,
+                    private juce::Timer,
+                    public juce::SettableTooltipClient {
 public:
   ForgeMascot();
   ~ForgeMascot() override = default;

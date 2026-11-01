@@ -66,7 +66,7 @@ void ForgeMascot::strike() {
 void ForgeMascot::burst(int count) {
   const auto badge = badgeAreaFor(getLocalBounds().toFloat());
   const auto xf = designTransformFor(badge);
-  const auto origin = xf.transformedPoint(juce::Point<float>(10.0f, 14.0f));
+  const auto origin = juce::Point<float>(10.0f, 14.0f).transformedBy(xf);
 
   for (int i = 0; i < count; ++i) {
     Spark sp;
@@ -176,15 +176,15 @@ void ForgeMascot::paint(juce::Graphics& g) {
   g.setColour(Palette::background);
   g.fillPath(anvil);
   g.setColour(Palette::textSecondary.withAlpha(0.22f));
-  g.drawLine(juce::Line<float>(xf.transformedPoint(juce::Point<float>(9.2f, 14.1f)),
-                               xf.transformedPoint(juce::Point<float>(23.2f, 14.1f))),
+  g.drawLine(juce::Line<float>(juce::Point<float>(9.2f, 14.1f).transformedBy(xf),
+                               juce::Point<float>(23.2f, 14.1f).transformedBy(xf)),
              1.0f * s);
 
   // Hammer: handle + head swing around the grip.
   const float angle = hammerAngle(sinceStrike);
   const auto rot = juce::AffineTransform::rotation(angle, 25.5f, 24.0f);
-  const auto headCentre = xf.transformedPoint(rot.transformedPoint(juce::Point<float>(12.0f, 10.0f)));
-  const auto grip = xf.transformedPoint(rot.transformedPoint(juce::Point<float>(25.5f, 24.0f)));
+  const auto headCentre = juce::Point<float>(12.0f, 10.0f).transformedBy(rot).transformedBy(xf);
+  const auto grip = juce::Point<float>(25.5f, 24.0f).transformedBy(rot).transformedBy(xf);
   g.setColour(Palette::background.withAlpha(0.85f));
   g.drawLine(juce::Line<float>(grip, headCentre), 3.8f * s);
   g.setColour(Palette::textSecondary);
@@ -201,7 +201,7 @@ void ForgeMascot::paint(juce::Graphics& g) {
 
   // Impact flash on the anvil face.
   if (flash > 0.01f) {
-    const auto centre = xf.transformedPoint(juce::Point<float>(10.0f, 14.0f));
+    const auto centre = juce::Point<float>(10.0f, 14.0f).transformedBy(xf);
     const float radius = (1.6f + (1.0f - flash) * 7.0f) * s;
     g.setColour(Palette::accentSoft.withAlpha(0.65f * flash));
     g.drawEllipse(centre.x - radius, centre.y - radius, radius * 2.0f, radius * 2.0f, 1.2f * s);
