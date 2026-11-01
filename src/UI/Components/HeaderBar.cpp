@@ -146,6 +146,18 @@ HeaderBar::HeaderBar(MidiForgeAudioProcessor& p) : processor(p) {
   addAndMakeVisible(variationSlider);
   variationSlider.setTooltip("Variacion: humanizacion extra (0 = cuadriculado)");
 
+  strictButton.setClickingTogglesState(true);
+  strictButton.setColour(juce::TextButton::buttonOnColourId, Palette::accentDim.brighter(0.22f));
+  strictButton.setTooltip(
+      "Escala estricta: acordes y bajo solo con notas de la escala elegida "
+      "(sin color prestado). Con pentatonica/blues la armonia usa su escala madre.");
+  strictButton.onClick = [this] {
+    processor.getCurrentIdea().strictScale = strictButton.getToggleState();
+    processor.generateFull();
+    refreshFromIdea();
+  };
+  addAndMakeVisible(strictButton);
+
   refreshFromIdea();
 }
 
@@ -165,6 +177,7 @@ void HeaderBar::forgeNewIdea(bool newSeed) {
 void HeaderBar::refreshFromIdea() {
   auto& idea = processor.getCurrentIdea();
   keyBox.setSelectedId(idea.keyRoot + 1, juce::dontSendNotification);
+  strictButton.setToggleState(idea.strictScale, juce::dontSendNotification);
 
   static const ScaleType types[] = {ScaleType::Major, ScaleType::MinorNatural, ScaleType::Dorian,
                                     ScaleType::Mixolydian, ScaleType::PentatonicMajor,
@@ -268,6 +281,8 @@ void HeaderBar::resized() {
     seedSlider.setBounds(rr.removeFromLeft(120).withSizeKeepingCentre(120, 24));
     rr.removeFromLeft(12);
     chatButton.setBounds(rr.removeFromLeft(64).reduced(0, 4));
+    rr.removeFromLeft(10);
+    strictButton.setBounds(rr.removeFromLeft(116).reduced(0, 4));
   }
   {
     auto rr = row2;

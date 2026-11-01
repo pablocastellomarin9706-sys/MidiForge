@@ -89,6 +89,7 @@ struct TrackIdea {
   bool mute{false};
   bool solo{false};
   bool edited{false};          // notes were tweaked by hand in the piano roll
+  bool locked{false};          // GENERATE / parameter changes must not rebuild it
   juce::String detail;         // e.g. "I-V-vi-IV" or pattern name, shown in UI
   std::vector<juce::String> chordSymbols; // per-chord names for the Chords preview
 };
@@ -105,6 +106,7 @@ struct SessionIdea {
   int bars{4};
   int keyRoot{0}; // 0-11 C..B
   ScaleType scale{ScaleType::Major};
+  bool strictScale{false}; // chords + bass stay inside the chosen scale too
   Style style{Style::Pop};
   Character character{Character::None};
   double swing{0.0}; // 0-100%

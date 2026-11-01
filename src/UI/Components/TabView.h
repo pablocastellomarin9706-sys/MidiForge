@@ -31,6 +31,7 @@ private:
   PianoRollMini pianoRoll;
   DrumGrid drumGrid;
   DragHandle drag;
+  juce::TextButton lockButton{"BLOQ"};
 
   const TrackIdea* findTrack() const;
   TrackIdea* trackMutable();

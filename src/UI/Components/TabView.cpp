@@ -14,11 +14,28 @@ TrackPage::TrackPage(MidiForgeAudioProcessor& p, juce::String name, int previewK
     processor.regenerateTrack(trackName);
     refresh();
   };
-  // Manual note edits mark the host state dirty and refresh the roll.
+  // Manual note edits mark the host state dirty and refresh the preview.
   pianoRoll.onEdited = [this] {
     processor.updateHostDisplay();
     refresh();
   };
+  drumGrid.onEdited = [this] {
+    processor.updateHostDisplay();
+    refresh();
+  };
+
+  lockButton.setClickingTogglesState(true);
+  lockButton.setColour(juce::TextButton::buttonOnColourId, Palette::accentDim.brighter(0.22f));
+  lockButton.setTooltip(
+      "Bloquear este track: GENERATE, Shuffle, Replace y los cambios de "
+      "parametros no lo regeneran. Se guarda con el proyecto.");
+  lockButton.onClick = [this] {
+    if (auto* t = trackMutable()) t->locked = lockButton.getToggleState();
+    processor.updateHostDisplay();
+    refresh();
+  };
+  addAndMakeVisible(lockButton);
+
   refresh();
 }
 
@@ -38,8 +55,11 @@ void TrackPage::refresh() {
   TrackIdea* t = trackMutable();
   chordStrip.setTrack(t);
   pianoRoll.setTrack(t, processor.getCurrentIdea().bars, kind == 1);
-  drumGrid.setTrack(t);
+  drumGrid.setTrack(t, processor.getCurrentIdea().bars, kind == 2);
+  lockButton.setToggleState(t != nullptr && t->locked, juce::dontSendNotification);
   detailText = (t != nullptr && t->detail.isNotEmpty()) ? t->detail : juce::String();
+  if (t != nullptr && t->locked)
+    detailText += "  ·  bloqueado";
   if (t != nullptr && t->edited)
     detailText += "  ·  editado a mano";
   repaint();
@@ -54,6 +74,7 @@ void TrackPage::paint(juce::Graphics& g) {
 
   auto r = getLocalBounds().reduced(12).removeFromTop(18);
   auto nameArea = r.removeFromLeft(90);
+  r.removeFromRight(70); // room for the BLOQ button
   g.setColour(Palette::accent);
   g.fillEllipse((float)nameArea.getX(), (float)nameArea.getCentreY() - 2.5f, 5.0f, 5.0f);
   g.setFont(juce::Font(juce::FontOptions(12.0f, juce::Font::bold)));
@@ -68,7 +89,8 @@ void TrackPage::paint(juce::Graphics& g) {
 
 void TrackPage::resized() {
   auto r = getLocalBounds().reduced(12);
-  r.removeFromTop(22);
+  auto header = r.removeFromTop(22);
+  lockButton.setBounds(header.removeFromRight(62).withSizeKeepingCentre(62, 18));
   drag.setBounds(r.removeFromTop(34));
   r.removeFromTop(10);
   if(kind == 0) chordStrip.setBounds(r);

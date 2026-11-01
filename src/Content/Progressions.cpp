@@ -124,28 +124,71 @@ std::vector<int> progressionIndicesFor(Style style, ScaleType chordScale, Charac
   return out;
 }
 
+// Diatonic chord built by stacking scale thirds. Unlike triadIntervals (which
+// only knows the generic major/minor template), this respects the real mode:
+// Dorian gives IV major, Mixolydian gives bVII major, harmonic minor gives a
+// diminished seventh on VII... Every chord tone is guaranteed to be in scale.
+static std::vector<int> strictDiatonicChord(const std::vector<int>& scalePcs,
+                                            int degree, bool seventh) {
+  const int n = (int)scalePcs.size();
+  if (n < 7 || degree < 1)
+    return seventh ? std::vector<int>{0, 4, 7, 10} : std::vector<int>{0, 4, 7};
+
+  auto tone = [&](int step) {
+    const int idx = degree - 1 + step;
+    const int oct = idx / n;
+    return scalePcs[(size_t)(idx % n)] + oct * 12;
+  };
+  const int root = tone(0);
+  std::vector<int> intervals{0, tone(2) - root, tone(4) - root};
+  if (seventh) intervals.push_back(tone(6) - root);
+  return intervals;
+}
+
 std::vector<RealizedChord> realizeProgression(const SessionIdea& idea) {
   std::vector<RealizedChord> out;
   const auto& progs = allProgressions();
   if (idea.progressionIdx < 0 || idea.progressionIdx >= (int)progs.size()) return out;
   const auto& prog = progs[(size_t)idea.progressionIdx];
 
+  // Strict scale mode: chords are built from the chosen scale (stacked scale
+  // thirds) and borrowed roots/qualities are ignored. Pentatonic and blues use
+  // their parent 7-note scale for the harmony; the melody still uses the
+  // 5-note scale, which is a consonant subset of it.
+  const bool strict = idea.strictScale;
+  ScaleType chordScale = prog.scale;
+  if (strict) {
+    const auto chosen = MusicTheory::getScale(idea.scale, 0);
+    if (chosen.size() >= 7) chordScale = idea.scale;
+    else chordScale = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural
+                                                             : ScaleType::Major;
+  }
+  const auto chordPcs = MusicTheory::getScale(chordScale, 0);
+  auto pcInScale = [&chordPcs](int midi) {
+    const int pc = ((midi % 12) + 12) % 12;
+    for (int s : chordPcs) if (s == pc) return true;
+    return false;
+  };
+
   int bars = idea.bars > 0 ? idea.bars : 4;
   std::vector<int> prev;
   for (int bar = 0; bar < bars; ++bar) {
     const auto& s = prog.chords[(size_t)bar % prog.chords.size()];
-    int semi = MusicTheory::degreeToSemitone(prog.scale, s.degree) + s.rootOffset;
+    int semi = MusicTheory::degreeToSemitone(chordScale, s.degree) + (strict ? 0 : s.rootOffset);
     int rootMidi = 48 + idea.keyRoot + semi;
     // Keep roots in a singable C3-B3-ish band, then voice around it.
     while (rootMidi < 43) rootMidi += 12;
     while (rootMidi > 55) rootMidi -= 12;
-    auto intervals = MusicTheory::triadIntervals(prog.scale, s.degree, s.quality, s.seventh);
+    auto intervals = strict
+        ? strictDiatonicChord(chordPcs, s.degree, s.seventh)
+        : MusicTheory::triadIntervals(prog.scale, s.degree, s.quality, s.seventh);
     // Bright/juicy: add the 9th on non-diminished chords when brightness is high.
     {
       bool h3 = false, h6 = false, h7 = false;
       for (int iv : intervals) { if (iv == 3) h3 = true; if (iv == 6) h6 = true; if (iv == 7) h7 = true; }
       bool isDim = h3 && h6 && !h7;
-      if (idea.brightness >= 0.75 && !isDim) intervals.push_back(14);
+      if (idea.brightness >= 0.75 && !isDim && (!strict || pcInScale(rootMidi + 14)))
+        intervals.push_back(14);
     }
     auto pitches = MusicTheory::realizeVoicing(rootMidi, intervals, prev);
     if (idea.brightness > 0.66 && !pitches.empty()) {

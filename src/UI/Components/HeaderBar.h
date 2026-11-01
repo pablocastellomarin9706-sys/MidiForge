@@ -25,6 +25,7 @@ private:
   juce::TextButton generateButton{"GENERATE"};
   juce::TextButton shuffleButton{"Shuffle"};
   juce::TextButton chatButton{"Chat"};
+  juce::TextButton strictButton{"DIATONICO"};
   juce::Label titleLabel;
   juce::ComboBox keyBox, scaleBox, styleBox;
   juce::Slider barsSlider, seedSlider, swingSlider, brightnessSlider, variationSlider;

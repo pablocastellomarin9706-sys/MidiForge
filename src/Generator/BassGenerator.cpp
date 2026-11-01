@@ -95,6 +95,28 @@ void BassGenerator::generate(SessionIdea& idea, RandomGen& rng) {
     }
   }
 
+  // Strict scale: the bass refuses chromatic notes too (the b7 used by some
+  // LoFi/trap lines snaps to the 6th or the octave).
+  if (idea.strictScale) {
+    ScaleType bs = idea.scale;
+    if (MusicTheory::getScale(idea.scale, 0).size() < 7)
+      bs = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural
+                                                  : ScaleType::Major;
+    const auto scale = MusicTheory::getScale(bs, idea.keyRoot);
+    auto inScale = [&scale](int p) {
+      const int pc = ((p % 12) + 12) % 12;
+      for (int s : scale) if (s == pc) return true;
+      return false;
+    };
+    for (auto& n : t.notes) {
+      if (inScale(n.pitch)) continue;
+      for (int d = 1; d <= 6; ++d) {
+        if (inScale(n.pitch - d)) { n.pitch -= d; break; }
+        if (inScale(n.pitch + d)) { n.pitch += d; break; }
+      }
+    }
+  }
+
   // 808 legato: overlap each note slightly with the next one so a mono 808 with
   // glide/portamento plays a real slide (the FL way) instead of stacked
   // staccato notes. Same pitch is skipped: retriggering would cut the tail.

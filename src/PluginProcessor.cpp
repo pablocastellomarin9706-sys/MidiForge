@@ -79,7 +79,7 @@ void MidiForgeAudioProcessor::changeProgramName(int, const juce::String&) {}
 
 void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   juce::XmlElement xml("MidiForgeState");
-  xml.setAttribute("version", 4);
+  xml.setAttribute("version", 5);
   xml.setAttribute("folders", sampleLibrary.getFolders().joinIntoString("\n"));
   xml.setAttribute("favorites", sampleLibrary.getFavorites().joinIntoString("\n"));
   xml.setAttribute("freesoundKey", freesoundKey);
@@ -93,6 +93,7 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   xml.setAttribute("bars", idea.bars);
   xml.setAttribute("keyRoot", idea.keyRoot);
   xml.setAttribute("scale", (int)idea.scale);
+  xml.setAttribute("strict", idea.strictScale ? 1 : 0);
   xml.setAttribute("style", (int)idea.style);
   xml.setAttribute("character", (int)idea.character);
   xml.setAttribute("swing", idea.swing);
@@ -119,6 +120,12 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
       ne->setAttribute("l", n.length);
       ne->setAttribute("v", n.velocity);
     }
+  }
+  // Locked tracks (protected from GENERATE / parameter changes).
+  auto* lockedXml = xml.createNewChildElement("lockedTracks");
+  for (const auto& t : idea.tracks) {
+    if (!t.locked) continue;
+    lockedXml->createNewChildElement("track")->setAttribute("name", t.name);
   }
   copyXmlToBinary(xml, destData);
 }
@@ -150,6 +157,7 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   idea.keyRoot = juce::jlimit(0, 11, xml->getIntAttribute("keyRoot", 0));
   idea.scale = (ScaleType)juce::jlimit(0, (int)ScaleType::Chromatic,
                                        xml->getIntAttribute("scale", (int)ScaleType::Major));
+  idea.strictScale = xml->getIntAttribute("strict", 0) != 0;
   idea.style = (Style)juce::jlimit(0, (int)Style::Rock,
                                    xml->getIntAttribute("style", (int)Style::Pop));
   idea.character = (Character)juce::jlimit(0, (int)Character::TrapLatino,
@@ -198,6 +206,17 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
     }
   }
 
+  // Restore lock flags (so the UI still shows BLOQ after reopening).
+  if (auto* locked = xml->getChildByName("lockedTracks")) {
+    for (int i = 0; i < locked->getNumChildElements(); ++i) {
+      auto* te = locked->getChildElement(i);
+      if (te == nullptr) continue;
+      const auto trackName = te->getStringAttribute("name");
+      for (auto& t : idea.tracks)
+        if (t.name == trackName) { t.locked = true; break; }
+    }
+  }
+
   // Sounds for the restored idea (best effort: the sample scan may still be
   // running; the SONIDO tab tops up the empty slots once it is ready).
   autoSoundRoll = 0;
@@ -213,6 +232,8 @@ void MidiForgeAudioProcessor::generateFull() {
 }
 
 void MidiForgeAudioProcessor::regenerateTrack(const juce::String& name) {
+  for (const auto& t : currentIdea.tracks)
+    if (t.name == name && t.locked) return;
   ++regenCounter;
   IdeaGenerator gen;
   gen.regenerateTrack(currentIdea, name, regenCounter);

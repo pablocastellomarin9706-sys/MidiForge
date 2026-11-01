@@ -30,6 +30,19 @@ static void restoreFlags(std::vector<TrackIdea>& tracks, const std::vector<Track
   }
 }
 
+// Locked tracks survive any regeneration untouched: notes, hand edits and
+// flags. The user locks a track to keep it while the rest of the idea changes.
+static void restoreLocked(std::vector<TrackIdea>& tracks, const std::vector<TrackIdea>& oldTracks) {
+  for (const auto& old : oldTracks) {
+    if (!old.locked) continue;
+    bool replaced = false;
+    for (auto& t : tracks) {
+      if (t.name == old.name) { t = old; replaced = true; break; }
+    }
+    if (!replaced) tracks.push_back(old);
+  }
+}
+
 // Character DNA: human jitter, velocity spread, note length, ghost hats.
 static void applyCharacterToTrack(SessionIdea& idea, TrackIdea& t, RandomGen& rng) {
   const auto P = Content::characterPresetOf(idea.character);
@@ -190,6 +203,7 @@ void IdeaGenerator::generateFull(SessionIdea& idea) {
   RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
   runAll(idea, rng);
   applyCharacterPost(idea, rng);
+  restoreLocked(idea.tracks, oldTracks);
   restoreFlags(idea.tracks, oldTracks);
 }
 
@@ -232,6 +246,9 @@ void IdeaGenerator::clearTrack(SessionIdea& idea, const juce::String& name) {
 
 void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& trackName, int seedOffset) {
   auto oldTracks = idea.tracks;
+  // Locked: Replace must not touch it.
+  for (const auto& t : oldTracks)
+    if (t.name == trackName && t.locked) return;
   clearTrack(idea, trackName);
   int64_t rs = baseSeedOf(idea) + (int64_t)seedOffset * 104729 + trackName.hashCode();
   RandomGen rng((int)(((rs % 2147483647) + 2147483647) % 2147483647));

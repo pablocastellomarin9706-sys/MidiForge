@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.4.0 - 2026-11-01
+
+### Added
+- **Grid de bateria editable**: 16 pasos por compas y 10 lanes GM (kick, snare,
+  clap, rim, hat, open hat, crash y 3 toms). Clic en una celda para activar o
+  quitar el golpe; las pestanas numeradas cambian de compas y la seccion B se
+  marca en ambar. Se guarda con el proyecto y muestra "editado a mano".
+- **Modo DIATONICO** (boton en la cabecera): acordes y bajo construidos apilando
+  terceras de la escala elegida, sin color prestado ni raices fuera de escala.
+  Con pentatonica/blues la armonia usa su escala madre de 7 notas (la melodia
+  sigue en la pentatonica). El bajo sanea sus b7 cromaticos.
+- **Bloqueo por track (BLOQ)**: GENERATE, Shuffle, Replace y los cambios de
+  parametros dejan intacto el track bloqueado, incluidas sus ediciones. El estado
+  de bloqueo se guarda con el proyecto.
+
+### Fixed
+- El detalle del track de acordes avisa cuando suena en modo estricto.
+
 ## 1.3.0 - 2026-11-01
 
 ### Added
