@@ -33,6 +33,7 @@ private:
   DragHandle drag;
 
   const TrackIdea* findTrack() const;
+  TrackIdea* trackMutable();
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackPage)
 };
 

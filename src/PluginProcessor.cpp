@@ -79,7 +79,7 @@ void MidiForgeAudioProcessor::changeProgramName(int, const juce::String&) {}
 
 void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   juce::XmlElement xml("MidiForgeState");
-  xml.setAttribute("version", 3);
+  xml.setAttribute("version", 4);
   xml.setAttribute("folders", sampleLibrary.getFolders().joinIntoString("\n"));
   xml.setAttribute("favorites", sampleLibrary.getFavorites().joinIntoString("\n"));
   xml.setAttribute("freesoundKey", freesoundKey);
@@ -103,6 +103,23 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   xml.setAttribute("drumIdx", idea.drumPatternIdx);
   xml.setAttribute("bassIdx", idea.bassPatternIdx);
   xml.setAttribute("motifIdx", idea.melodyMotifIdx);
+
+  // Manual piano-roll edits are the only non-deterministic part of an idea, so
+  // they are stored note by note (only for the tracks the user touched).
+  auto* editedXml = xml.createNewChildElement("editedTracks");
+  for (const auto& t : idea.tracks) {
+    if (!t.edited) continue;
+    auto* te = editedXml->createNewChildElement("track");
+    te->setAttribute("name", t.name);
+    te->setAttribute("channel", t.channel);
+    for (const auto& n : t.notes) {
+      auto* ne = te->createNewChildElement("n");
+      ne->setAttribute("p", n.pitch);
+      ne->setAttribute("s", n.start);
+      ne->setAttribute("l", n.length);
+      ne->setAttribute("v", n.velocity);
+    }
+  }
   copyXmlToBinary(xml, destData);
 }
 
@@ -151,6 +168,35 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   IdeaGenerator gen;
   gen.generateFromSaved(idea);
   IdeaGenerator::applyCreativity(idea, idea.creativity, 0);
+
+  // Hand-edited tracks come back exactly as they were left, on top of the
+  // regenerated idea (a track the user never touched stays generated).
+  if (auto* edited = xml->getChildByName("editedTracks")) {
+    for (int i = 0; i < edited->getNumChildElements(); ++i) {
+      auto* te = edited->getChildElement(i);
+      if (te == nullptr) continue;
+      const auto trackName = te->getStringAttribute("name");
+      for (auto& t : idea.tracks) {
+        if (t.name != trackName) continue;
+        std::vector<Note> notes;
+        notes.reserve((size_t)te->getNumChildElements());
+        for (int j = 0; j < te->getNumChildElements(); ++j) {
+          auto* ne = te->getChildElement(j);
+          if (ne == nullptr) continue;
+          Note n{};
+          n.pitch = juce::jlimit(0, 127, ne->getIntAttribute("p", 60));
+          n.start = juce::jmax(0.0, ne->getDoubleAttribute("s", 0.0));
+          n.length = juce::jmax(0.05, ne->getDoubleAttribute("l", 0.25));
+          n.velocity = juce::jlimit(1, 127, ne->getIntAttribute("v", 100));
+          n.channel = t.channel;
+          notes.push_back(n);
+        }
+        t.notes = std::move(notes);
+        t.edited = true;
+        break;
+      }
+    }
+  }
 
   // Sounds for the restored idea (best effort: the sample scan may still be
   // running; the SONIDO tab tops up the empty slots once it is ready).

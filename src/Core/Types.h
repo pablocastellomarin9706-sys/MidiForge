@@ -88,6 +88,7 @@ struct TrackIdea {
   juce::Colour colour;
   bool mute{false};
   bool solo{false};
+  bool edited{false};          // notes were tweaked by hand in the piano roll
   juce::String detail;         // e.g. "I-V-vi-IV" or pattern name, shown in UI
   std::vector<juce::String> chordSymbols; // per-chord names for the Chords preview
 };

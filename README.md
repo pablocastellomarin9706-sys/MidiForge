@@ -40,7 +40,12 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
 - [x] **Mascota animada de la forja** (v1.2): yunque + martillo que golpea solo y
       salta chispas; se puede pulsar para forjar una idea nueva. Tooltips en todos
       los controles
-- [ ] Mini editor de piano roll editable (fase siguiente)
+- [x] **Piano roll editable** (v1.3): mueve, alarga, anade y borra notas en Melody y
+      Bass, con Ctrl+Z. Las ediciones se guardan con el proyecto y se marcan como
+      EDITADO
+- [x] **Seccion B + fills cada 4 compases** (v1.3) y **glide de 808** por solape de
+      notas para que el portamento haga el slide
+- [ ] Editor de bateria editable (grid de pasos) y undo multi-nivel por track
 
 ## Requisitos (para compilar)
 

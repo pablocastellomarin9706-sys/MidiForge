@@ -126,20 +126,48 @@ void DrumGenerator::generate(SessionIdea& idea, RandomGen& rng) {
   t.detail = pat.name;
 
   int bars = idea.bars > 0 ? idea.bars : 4;
+
+  // 8+ bar ideas get a second groove for the B half, so a long loop is not the
+  // same four bars pasted over and over.
+  int secondIdx = -1;
+  const int secondStart = bars / 2;
+  if (bars >= 8) {
+    auto cands = Content::drumIndicesFor(idea.style, idea.character);
+    if (cands.size() > 1) {
+      const int start = rng.nextInt(0, (int)cands.size() - 1);
+      for (int k = 1; k <= (int)cands.size(); ++k) {
+        const int cand = cands[(size_t)((start + k) % (int)cands.size())];
+        if (cand != idea.drumPatternIdx) { secondIdx = cand; break; }
+      }
+    }
+  }
+
+  if (secondIdx >= 0)
+    t.detail = pat.name + "  /  " + pats[(size_t)secondIdx].name;
+
   for (int bar = 0; bar < bars; ++bar) {
     double base = (double)bar * 4.0;
     const bool lastBar = (bar == bars - 1);
+    const bool inB = secondIdx >= 0 && bar >= secondStart;
+    const auto& active = inB ? pats[(size_t)secondIdx] : pat;
 
-    for (const auto& h : pat.hits)
+    for (const auto& h : active.hits)
       pushHit(t, idea, base, h.step, h.pitch, h.velocity, rng);
+
+    // Crash into the B section.
+    if (bar == secondStart && secondIdx >= 0)
+      pushHit(t, idea, base, 0, Content::kCrash, 112, rng);
 
     // Odd bars get a stylistic touch, so bar 2 is not a clone of bar 1.
     if (bars > 1 && !lastBar && (bar % 2 == 1))
       addBarVariation(t, idea, base, rng);
 
-    if (bars > 1 && lastBar) {
+    // Every 4th bar (and the final bar) gets a fill: 8/16-bar ideas breathe
+    // instead of looping a single bar of drums.
+    const bool phraseEnd = (bars > 1) && ((bar + 1) % 4 == 0);
+    if (bars > 1 && (phraseEnd || lastBar)) {
       // Crash on the downbeat for the styles that use one, then the fill.
-      if (idea.style != Style::HipHop && idea.style != Style::LoFi)
+      if (lastBar && idea.style != Style::HipHop && idea.style != Style::LoFi)
         pushHit(t, idea, base, 0, Content::kCrash, 108, rng);
       addFill(t, idea, base, rng);
     }

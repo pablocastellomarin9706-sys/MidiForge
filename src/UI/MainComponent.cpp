@@ -32,10 +32,11 @@ MainComponent::MainComponent(MidiForgeAudioProcessor& p) : processor(p) {
     sidebar->refreshFromIdea();
   };
 
-  // Generate the first idea so the UI shows something on open. If a saved
-  // state was restored (setStateInformation ran before the editor opened),
-  // generateFull() deterministically reproduces that exact idea.
-  processor.generateFull();
+  // Generate a first idea only when there is none. If a saved state was
+  // restored (setStateInformation ran before the editor opened), its tracks
+  // -- including any hand-edited notes -- must survive opening the editor.
+  if (processor.getCurrentIdea().tracks.empty())
+    processor.generateFull();
   header->refreshFromIdea(); // sliders/combos follow the (restored or fresh) idea
   tabsView->refreshAll();
 }

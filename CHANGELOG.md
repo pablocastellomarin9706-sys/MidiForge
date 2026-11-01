@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.3.0 - 2026-11-01
+
+### Added
+- **Piano roll editable** en Melody y Bass: arrastra una nota para moverla, tira del
+  borde derecho para alargarla, doble clic en el hueco para anadir, clic derecho (o
+  Alt+clic) para borrar y **Ctrl+Z** para deshacer. Rejilla de 1/16 y nota
+  seleccionada resaltada.
+- **Las ediciones se guardan con el proyecto**: los tracks tocados a mano se
+  serializan nota a nota en el estado del plugin. Antes, al reabrir, todo se
+  regeneraba desde la semilla. El track muestra el chip EDITADO y la etiqueta
+  "editado a mano".
+- **Seccion B en ideas de 8+ compases**: la segunda mitad usa otro groove de la
+  misma familia, con crash de entrada, y la melodia cambia de celulas y sube un
+  poco de intensidad.
+- **Fills cada 4 compases** (ademas del final): turnarounds de trap, builds de
+  house/EDM, toms de rock... asi un loop de 8/16 compases no suena copiado.
+- **Glide real de 808**: en HipHop las notas de bajo se solapan ligeramente con la
+  siguiente para que un 808 mono con portamento haga el slide (estilo FL), sin
+  tocar dos veces la misma nota.
+
+### Fixed
+- Al abrir el editor se regeneraba la idea y se habrian perdido las ediciones
+  manuales; ahora solo se genera si no habia ninguna idea restaurada.
+
 ## 1.2.0 - 2026-11-01
 
 ### Fixed

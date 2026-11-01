@@ -14,6 +14,11 @@ TrackPage::TrackPage(MidiForgeAudioProcessor& p, juce::String name, int previewK
     processor.regenerateTrack(trackName);
     refresh();
   };
+  // Manual note edits mark the host state dirty and refresh the roll.
+  pianoRoll.onEdited = [this] {
+    processor.updateHostDisplay();
+    refresh();
+  };
   refresh();
 }
 
@@ -23,12 +28,20 @@ const TrackIdea* TrackPage::findTrack() const {
   return nullptr;
 }
 
+TrackIdea* TrackPage::trackMutable() {
+  for(auto& t : processor.getCurrentIdea().tracks)
+    if(t.name == trackName) return &t;
+  return nullptr;
+}
+
 void TrackPage::refresh() {
-  const TrackIdea* t = findTrack();
+  TrackIdea* t = trackMutable();
   chordStrip.setTrack(t);
-  pianoRoll.setTrack(t);
+  pianoRoll.setTrack(t, processor.getCurrentIdea().bars, kind == 1);
   drumGrid.setTrack(t);
   detailText = (t != nullptr && t->detail.isNotEmpty()) ? t->detail : juce::String();
+  if (t != nullptr && t->edited)
+    detailText += "  ·  editado a mano";
   repaint();
 }
 

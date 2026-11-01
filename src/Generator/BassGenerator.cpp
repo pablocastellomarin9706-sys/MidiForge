@@ -4,6 +4,7 @@
 #include "../Content/Patterns.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace MidiForge {
 
@@ -91,6 +92,22 @@ void BassGenerator::generate(SessionIdea& idea, RandomGen& rng) {
       const int nextRoot = chords[(size_t)((ci + 1) % n)].rootMidi - 12;
       const int octaveUp = rng.nextDouble() < 0.4 ? 12 : 0;
       pushNote(t, idea, ch.startBeat, 15, nextRoot + octaveUp, 0.2, 92, rng);
+    }
+  }
+
+  // 808 legato: overlap each note slightly with the next one so a mono 808 with
+  // glide/portamento plays a real slide (the FL way) instead of stacked
+  // staccato notes. Same pitch is skipped: retriggering would cut the tail.
+  if (idea.style == Style::HipHop && t.notes.size() > 1) {
+    std::stable_sort(t.notes.begin(), t.notes.end(),
+                     [](const Note& a, const Note& b) { return a.start < b.start; });
+    for (size_t i = 0; i + 1 < t.notes.size(); ++i) {
+      auto& a = t.notes[i];
+      const auto& b = t.notes[i + 1];
+      const double gap = b.start - (a.start + a.length);
+      const double step = std::abs(b.start - a.start);
+      if (a.pitch != b.pitch && gap >= -0.001 && gap <= 0.30 && step <= 2.05)
+        a.length += gap + 0.05;
     }
   }
 

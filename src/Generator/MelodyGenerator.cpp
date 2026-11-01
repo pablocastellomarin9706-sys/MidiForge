@@ -87,7 +87,10 @@ void MelodyGenerator::generate(SessionIdea& idea, RandomGen& rng) {
   const int stepChoices[] = {-2, -1, -1, 0, 1, 1, 2, 3};
 
   for (int bar = 0; bar < bars; ++bar) {
-    const auto& motif = motifs[(size_t)pool[(size_t)((pos + bar) % (int)pool.size())]];
+    const bool inB = bars >= 8 && bar >= bars / 2;
+    const int motifShift = inB ? (int)pool.size() / 2 : 0;
+    const auto& motif =
+        motifs[(size_t)pool[(size_t)((pos + bar + motifShift) % (int)pool.size())]];
     const auto& ch = chords[(size_t)bar % chords.size()];
     for (size_t ni = 0; ni < motif.notes.size(); ++ni) {
       double off = motif.notes[ni].first;
@@ -118,6 +121,7 @@ void MelodyGenerator::generate(SessionIdea& idea, RandomGen& rng) {
 
       int vel = 80 + (int)(idea.brightness * 18.0) + rng.nextInt(-10, 10);
       if (phraseStart) vel += 10;
+      if (inB) vel += 5;
       vel = juce::jlimit(1, 127, vel);
       t.notes.push_back({pitch, start, len, vel, 2});
     }

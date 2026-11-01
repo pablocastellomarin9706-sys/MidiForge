@@ -181,8 +181,13 @@ void IdeaGenerator::runAll(SessionIdea& idea, RandomGen& rng) {
 void IdeaGenerator::generateFull(SessionIdea& idea) {
   auto oldTracks = idea.tracks;
   idea.tracks.clear();
+  // Two independent streams: curated picks and note generation. The restore
+  // path replays only the note stream, so a reopened project sounds exactly
+  // like it did when it was saved (before, pickAll shifted the stream and the
+  // restored idea came out different).
+  RandomGen pickRng((int)((baseSeedOf(idea) ^ 0x2f6a1b3) % 2147483647));
+  pickAll(idea, pickRng);
   RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
-  pickAll(idea, rng);
   runAll(idea, rng);
   applyCharacterPost(idea, rng);
   restoreFlags(idea.tracks, oldTracks);
@@ -204,7 +209,8 @@ void IdeaGenerator::generateFromSaved(SessionIdea& idea) {
 
   idea.tracks.clear(); // idempotent: hosts may call setStateInformation twice
   if (!idsOk) {
-    pickAll(idea, rng);
+    RandomGen pickRng((int)((baseSeedOf(idea) ^ 0x2f6a1b3) % 2147483647));
+    pickAll(idea, pickRng);
   } else {
     const auto& prog = Content::allProgressions()[(size_t)idea.progressionIdx];
     idea.progressionDisplay = prog.display;
