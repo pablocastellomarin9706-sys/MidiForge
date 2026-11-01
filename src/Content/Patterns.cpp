@@ -44,6 +44,70 @@ const std::vector<DrumPattern>& allDrumPatterns() {
       dh(4,kSnare,120), dh(12,kSnare,120),
       dh(0,kHat,90), dh(2,kHat,85), dh(4,kHat,95), dh(6,kHat,85),
       dh(8,kHat,90), dh(10,kHat,85), dh(12,kHat,95), dh(14,kHat,90)}},
+    // ---- v1.2: two or three extra grooves per genre. Most styles only had a
+    // single pattern, so Shuffle/Replace could not change the drums at all.
+    {"Pop Shuffle Hats", Style::Pop, {
+      dh(0,kKick,118), dh(10,kKick,104),
+      dh(4,kSnare,112), dh(12,kSnare,116),
+      dh(0,kHat,88), dh(2,kHat,78), dh(4,kHat,92), dh(6,kHat,76), dh(7,kHat,64),
+      dh(8,kHat,88), dh(10,kHat,78), dh(12,kHat,92), dh(14,kOpenHat,84), dh(15,kHat,62)}},
+    {"Pop Ghost Rim", Style::Pop, {
+      dh(0,kKick,120), dh(6,kKick,100), dh(8,kKick,112),
+      dh(4,kSnare,114), dh(12,kSnare,114), dh(14,kSnare,50),
+      dh(10,kRim,68),
+      dh(0,kHat,86), dh(2,kHat,76), dh(4,kHat,90), dh(6,kHat,76),
+      dh(8,kHat,86), dh(10,kHat,76), dh(12,kHat,90), dh(14,kHat,80)}},
+    {"LoFi Drunk Swing", Style::LoFi, {
+      dh(0,kKick,112), dh(10,kKick,98),
+      dh(4,kRim,84), dh(12,kSnare,100), dh(15,kSnare,44),
+      dh(0,kHat,76), dh(2,kHat,70), dh(4,kHat,80), dh(6,kOpenHat,62),
+      dh(8,kHat,74), dh(10,kHat,80), dh(12,kHat,84), dh(14,kHat,70)}},
+    {"LoFi Tape Skip", Style::LoFi, {
+      dh(0,kKick,114), dh(7,kKick,96), dh(11,kKick,100),
+      dh(4,kSnare,106), dh(12,kSnare,108),
+      dh(0,kHat,78), dh(2,kHat,72), dh(4,kHat,82), dh(6,kHat,70),
+      dh(8,kHat,78), dh(10,kHat,72), dh(12,kHat,82), dh(14,kRim,56)}},
+    {"House Offbeat Open", Style::House, {
+      dh(0,kKick,122), dh(4,kKick,122), dh(8,kKick,122), dh(12,kKick,122),
+      dh(4,kClap,108), dh(12,kClap,108),
+      dh(2,kOpenHat,92), dh(6,kOpenHat,88), dh(10,kOpenHat,92), dh(14,kOpenHat,86),
+      dh(4,kHat,60), dh(12,kHat,58)}},
+    {"House Two Step", Style::House, {
+      dh(0,kKick,120), dh(10,kKick,108),
+      dh(4,kClap,110), dh(12,kSnare,106), dh(7,kSnare,52),
+      dh(2,kHat,86), dh(6,kHat,80), dh(11,kOpenHat,84), dh(14,kHat,88)}},
+    {"HipHop Trap Rolls", Style::HipHop, {
+      dh(0,kKick,122), dh(6,kKick,104), dh(10,kKick,112), dh(14,kKick,98),
+      dh(8,kSnare,120), dh(15,kRim,56),
+      dh(0,kHat,82), dh(1,kHat,70), dh(2,kHat,80), dh(3,kHat,72),
+      dh(4,kHat,84), dh(5,kHat,70), dh(6,kHat,80), dh(7,kHat,90),
+      dh(8,kHat,82), dh(9,kHat,70), dh(10,kHat,80), dh(11,kHat,72),
+      dh(12,kHat,84), dh(13,kHat,70), dh(14,kHat,88), dh(15,kHat,94)}},
+    {"HipHop Boom Bap Swing", Style::HipHop, {
+      dh(0,kKick,118), dh(7,kKick,104), dh(10,kKick,110),
+      dh(4,kSnare,112), dh(12,kSnare,116), dh(14,kSnare,48),
+      dh(0,kHat,84), dh(2,kHat,74), dh(4,kHat,88), dh(6,kHat,74),
+      dh(8,kHat,84), dh(10,kHat,74), dh(12,kHat,88), dh(15,kHat,66)}},
+    {"EDM Festival Lift", Style::EDM, {
+      dh(0,kKick,124), dh(4,kKick,124), dh(8,kKick,124), dh(12,kKick,124),
+      dh(4,kClap,114), dh(12,kClap,114),
+      dh(2,kOpenHat,90), dh(6,kOpenHat,86), dh(10,kOpenHat,90), dh(14,kOpenHat,94),
+      dh(0,kHat,80), dh(8,kHat,80)}},
+    {"EDM Half Time Drop", Style::EDM, {
+      dh(0,kKick,124), dh(8,kKick,118), dh(11,kKick,104),
+      dh(4,kClap,118), dh(12,kClap,112),
+      dh(0,kHat,82), dh(2,kHat,74), dh(4,kHat,84), dh(6,kHat,74),
+      dh(8,kHat,82), dh(10,kHat,74), dh(12,kHat,84), dh(14,kOpenHat,88)}},
+    {"Rock Half Time Crash", Style::Rock, {
+      dh(0,kCrash,104), dh(0,kKick,120), dh(8,kKick,112),
+      dh(4,kSnare,118), dh(12,kSnare,120),
+      dh(0,kHat,88), dh(2,kHat,80), dh(4,kHat,92), dh(6,kHat,80),
+      dh(8,kHat,88), dh(10,kHat,80), dh(12,kHat,92), dh(14,kHat,84)}},
+    {"Rock Punk Push", Style::Rock, {
+      dh(0,kKick,122), dh(4,kKick,112), dh(8,kKick,122), dh(12,kKick,112),
+      dh(4,kSnare,120), dh(12,kSnare,120),
+      dh(0,kHat,92), dh(2,kHat,86), dh(4,kHat,96), dh(6,kHat,86),
+      dh(8,kHat,92), dh(10,kHat,86), dh(12,kHat,96), dh(14,kHat,90)}},
     // ---- Character-specific (HipHop family) ----
     // Detroit: hard half-time, punchy syncopated kicks, clap+snare, open hats.
     {"Detroit Punch", Style::HipHop, {
@@ -156,6 +220,38 @@ const std::vector<BassPattern>& allBassPatterns() {
     {"Rock Eighths", Style::Rock, {
       bh(0,0,0.5,112), bh(2,0,0.5,108), bh(4,0,0.5,110), bh(6,0,0.5,108),
       bh(8,0,0.5,112), bh(10,0,0.5,108), bh(12,0,0.5,110), bh(14,7,0.5,106)}},
+    // ---- v1.2: extra lines per genre (each style had a single bass pattern).
+    {"Pop Fifth Pickup", Style::Pop, {
+      bh(0,0,1.5,108), bh(6,7,0.5,96), bh(8,0,1.5,106), bh(14,7,0.5,94)}},
+    {"Pop Octave Hook", Style::Pop, {
+      bh(0,0,1.0,110), bh(4,12,0.5,100), bh(6,0,1.0,106),
+      bh(10,12,0.5,98), bh(12,0,1.5,106)}},
+    {"LoFi Seventh Lazy", Style::LoFi, {
+      bh(0,0,3.0,102), bh(12,10,1.0,90)}},
+    {"LoFi Ghost Fifth", Style::LoFi, {
+      bh(0,0,2.0,104), bh(8,0,1.5,96), bh(14,7,0.5,88)}},
+    {"House Pump Octave", Style::House, {
+      bh(2,0,0.4,112), bh(6,12,0.4,104), bh(10,0,0.4,112), bh(14,12,0.4,104)}},
+    {"House Acid Slide", Style::House, {
+      bh(0,0,0.4,114), bh(3,0,0.4,106), bh(6,12,0.4,110),
+      bh(10,0,0.4,108), bh(14,7,0.4,104)}},
+    {"Trap 808 Sparse", Style::HipHop, {
+      bh(0,0,2.5,112), bh(10,0,1.0,104), bh(14,12,0.5,98)}},
+    {"808 Long Glide", Style::HipHop, {
+      bh(0,0,3.5,110), bh(14,7,0.5,96)}},
+    {"Boom Bap Walk", Style::HipHop, {
+      bh(0,0,1.5,106), bh(6,0,1.0,100), bh(10,7,1.0,102), bh(14,10,0.5,94)}},
+    {"EDM Octave Drive", Style::EDM, {
+      bh(0,0,0.5,112), bh(2,12,0.5,104), bh(4,0,0.5,112), bh(6,12,0.5,104),
+      bh(8,0,0.5,112), bh(10,12,0.5,104), bh(12,0,0.5,112), bh(14,7,0.5,106)}},
+    {"EDM Pluck Bass", Style::EDM, {
+      bh(0,0,0.4,114), bh(2,0,0.4,106), bh(4,12,0.4,110), bh(8,0,0.4,112),
+      bh(10,7,0.4,104), bh(12,0,0.4,110), bh(14,12,0.4,102)}},
+    {"Rock Root Fifth", Style::Rock, {
+      bh(0,0,0.5,112), bh(2,7,0.5,104), bh(4,0,0.5,110), bh(6,7,0.5,104),
+      bh(8,0,0.5,112), bh(10,7,0.5,104), bh(12,0,0.5,110), bh(14,7,0.5,106)}},
+    {"Rock Punch", Style::Rock, {
+      bh(0,0,1.0,114), bh(4,0,0.5,104), bh(6,7,0.5,102), bh(8,0,1.5,110)}},
     // ---- Character-specific 808s (HipHop family) ----
     {"Detroit 808", Style::HipHop, {
       bh(0,0,2.0,110), bh(8,0,2.0,108), bh(14,7,0.5,98)}, Character::Detroit},
@@ -202,8 +298,25 @@ const std::vector<Motif>& allMotifs() {
     {"Sparse Air", {{0.0,1.5},{2.0,1.5}}},
     {"Quarter Walk", {{0.0,0.9},{1.0,0.9},{2.0,0.9},{3.0,0.9}}},
     {"Offbeat Float", {{0.5,1.0},{2.5,1.0}}},
+    // ---- v1.2: cells with more genre personality ----
+    {"Push Pickup", {{0.0,0.5},{0.75,0.25},{1.0,1.0},{2.75,0.25},{3.0,0.75}}},
+    {"Half Note Hang", {{0.0,2.0},{2.5,1.0}}},
+    {"Triplet Run", {{0.0,0.33},{0.33,0.33},{0.66,0.33},{2.0,0.5},{2.5,1.0}}},
+    {"Echo Drop", {{0.0,0.75},{1.0,0.5},{1.75,0.25},{3.0,0.75}}},
   };
   return motifs;
+}
+
+std::vector<int> motifIndicesFor(Style style) {
+  switch (style) {
+    case Style::Pop:    return {0, 1, 4, 6};
+    case Style::LoFi:   return {3, 5, 7, 1};
+    case Style::House:  return {2, 5, 6, 4};
+    case Style::HipHop: return {0, 2, 3, 8, 5};
+    case Style::EDM:    return {4, 2, 6, 9};
+    case Style::Rock:   return {4, 0, 7, 8};
+  }
+  return {0, 1, 2, 3};
 }
 
 std::vector<int> drumIndicesFor(Style style, Character character) {

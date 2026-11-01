@@ -14,6 +14,9 @@ inline constexpr int kRim = 37;
 inline constexpr int kHat = 42;
 inline constexpr int kOpenHat = 46;
 inline constexpr int kCrash = 49;
+inline constexpr int kTomLow = 45;
+inline constexpr int kTomMid = 47;
+inline constexpr int kTomHigh = 50;
 
 struct DrumHit {
   int step{0};     // 16th-note step within one bar (0-15)
@@ -59,5 +62,9 @@ std::vector<int> bassIndicesFor(Style style, Character character = Character::No
 
 // (offsetBeats, lenBeats) hits for the chord track, per style, within one bar.
 std::vector<std::pair<double, double>> chordRhythmFor(Style style);
+
+// Indices into allMotifs() that suit a given style, so each genre leans on its
+// own rhythmic cells instead of sharing one pool. Never empty.
+std::vector<int> motifIndicesFor(Style style);
 
 } // namespace MidiForge::Content

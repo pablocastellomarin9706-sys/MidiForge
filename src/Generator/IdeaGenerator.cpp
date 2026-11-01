@@ -153,7 +153,9 @@ void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
   idea.bassPatternIdx = bass[(size_t)rng.nextInt(0, (int)bass.size() - 1)];
   idea.bassPatternName = Content::allBassPatterns()[(size_t)idea.bassPatternIdx].name;
 
-  idea.melodyMotifIdx = rng.nextInt(0, (int)Content::allMotifs().size() - 1);
+  // Melody cells come from the style's own pool, not from every motif at once.
+  auto motifs = Content::motifIndicesFor(idea.style);
+  idea.melodyMotifIdx = motifs[(size_t)rng.nextInt(0, (int)motifs.size() - 1)];
 }
 
 static int pickDifferent(const std::vector<int>& cands, int current, RandomGen& rng) {
@@ -247,9 +249,14 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     }
     BassGenerator bg; bg.generate(idea, rng);
   } else if (trackName == "Melody") {
-    int n = (int)Content::allMotifs().size();
-    int pick = rng.nextInt(0, n - 1);
-    if (pick == idea.melodyMotifIdx && n > 1) pick = (pick + 1) % n;
+    auto motifs = Content::motifIndicesFor(idea.style);
+    int pick = motifs[(size_t)rng.nextInt(0, (int)motifs.size() - 1)];
+    if (pick == idea.melodyMotifIdx && motifs.size() > 1) {
+      size_t pos = 0;
+      for (size_t i = 0; i < motifs.size(); ++i)
+        if (motifs[i] == idea.melodyMotifIdx) { pos = i; break; }
+      pick = motifs[(pos + 1) % motifs.size()];
+    }
     idea.melodyMotifIdx = pick;
     MelodyGenerator mg; mg.generate(idea, rng);
   } else if (trackName == "Bass") {
