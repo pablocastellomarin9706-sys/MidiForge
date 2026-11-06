@@ -120,6 +120,21 @@ struct SessionIdea {
   int drumPatternIdx{-1};
   int bassPatternIdx{-1};
   int melodyMotifIdx{-1};
+
+  // A/B arrangement. splitBar is the 0-based index of the first B bar:
+  //   -1  = auto (half of the idea when 8+ bars, no B otherwise)
+  //    n  = user boundary from the arrangement editor
+  //   bars= everything is A (no B section)
+  int splitBar{-1};
+
+  int totalBars() const { return bars > 0 ? bars : 4; }
+  // First bar of section B; equals totalBars() when there is no B section.
+  int bStart() const {
+    const int total = totalBars();
+    if (splitBar < 0) return total >= 8 ? total / 2 : total; // legacy auto
+    return juce::jlimit(1, total, splitBar);
+  }
+  bool hasSectionB() const { return bStart() < totalBars(); }
   juce::String progressionDisplay;
   juce::String progressionName;
   juce::String drumPatternName;

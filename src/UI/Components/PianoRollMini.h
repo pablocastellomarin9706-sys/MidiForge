@@ -16,7 +16,7 @@ class PianoRollMini : public juce::Component,
 public:
   PianoRollMini() = default;
 
-  void setTrack(TrackIdea* t, int bars, bool canEdit);
+  void setTrack(TrackIdea* t, int bars, bool canEdit, int bStartBar = -1);
   void paint(juce::Graphics&) override;
 
   std::function<void()> onEdited;
@@ -34,6 +34,7 @@ private:
 
   TrackIdea* track{nullptr};
   int bars{4};
+  int bStart{-1}; // first bar of section B (-1 = none); marks the roll
   bool editable{false};
   int minPitch{60}, maxPitch{84};
   double maxBeat{16.0};

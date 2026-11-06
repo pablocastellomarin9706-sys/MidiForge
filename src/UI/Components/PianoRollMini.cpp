@@ -55,10 +55,11 @@ RollLayout makeLayoutFor(juce::Rectangle<float> bounds, int minPitch, int maxPit
 
 } // namespace
 
-void PianoRollMini::setTrack(TrackIdea* t, int barCount, bool canEdit) {
+void PianoRollMini::setTrack(TrackIdea* t, int barCount, bool canEdit, int bStartBar) {
   const bool sameTrack = (t == track) && (barCount == bars);
   track = t;
   bars = juce::jmax(1, barCount);
+  bStart = bStartBar;
   maxBeat = (double)bars * 4.0;
   editable = canEdit;
 
@@ -196,10 +197,10 @@ void PianoRollMini::paint(juce::Graphics& g) {
     }
   }
 
-  // A/B arrangement: 8+ bar ideas switch progression and motif at the halfway
-  // point, so the roll marks the boundary.
-  const double bBeat = (double)(bars / 2) * 4.0;
-  if (bars >= 8 && bBeat < L.maxBeat) {
+  // A/B arrangement: the boundary picked in the ARREGLO tab (or the auto
+  // half) switches progression and motif, so the roll marks it.
+  const double bBeat = (double)bStart * 4.0;
+  if (bStart > 0 && bStart < bars && bBeat < L.maxBeat) {
     const float xb = L.xForBeat(bBeat);
     g.setColour(Palette::accent.withAlpha(0.60f));
     g.drawVerticalLine((int)xb, area.getY(), area.getBottom());

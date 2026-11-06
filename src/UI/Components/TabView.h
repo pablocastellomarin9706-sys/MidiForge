@@ -11,6 +11,7 @@
 #include "DragHandle.h"
 #include "SampleBrowser.h"
 #include "AutoSoundPanel.h"
+#include "ArrangementPanel.h"
 
 namespace MidiForge {
 
@@ -47,6 +48,7 @@ public:
 private:
   juce::TabbedComponent tabs{juce::TabbedButtonBar::TabsAtTop};
   std::vector<std::unique_ptr<TrackPage>> pages;
+  std::unique_ptr<ArrangementPanel> arrangementPage;
   std::unique_ptr<SampleBrowser> samplePage;
   std::unique_ptr<AutoSoundPanel> soundPage;
 

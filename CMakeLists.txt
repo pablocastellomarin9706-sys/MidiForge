@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(MidiForge
-  VERSION 1.6.0
+  VERSION 1.7.0
   LANGUAGES CXX
 )
 
@@ -94,6 +94,8 @@ target_sources(MidiForge
     src/UI/Components/PianoRollMini.h
     src/UI/Components/DrumGrid.cpp
     src/UI/Components/DrumGrid.h
+    src/UI/Components/ArrangementPanel.cpp
+    src/UI/Components/ArrangementPanel.h
     src/UI/Components/DragHandle.cpp
     src/UI/Components/DragHandle.h
     src/UI/Components/ChatPanel.cpp

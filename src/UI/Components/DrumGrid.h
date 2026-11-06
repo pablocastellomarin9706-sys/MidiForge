@@ -15,7 +15,7 @@ class DrumGrid : public juce::Component,
 public:
   DrumGrid() = default;
 
-  void setTrack(TrackIdea* t, int bars, bool canEdit);
+  void setTrack(TrackIdea* t, int bars, bool canEdit, int bStartBar = -1);
   void paint(juce::Graphics&) override;
 
   std::function<void()> onEdited;
@@ -37,6 +37,7 @@ private:
 
   TrackIdea* track{nullptr};
   int bars{4};
+  int bStart{-1}; // first bar of section B (-1 = none); tints the bar tabs
   int currentBar{0};
   bool editable{true};
 

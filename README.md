@@ -57,7 +57,8 @@ los clips MIDI** al Piano Roll y **los samples/loops** a la Playlist.
 - [x] **Stems WAV + MIDI** (v1.6): boton en SONIDO; guarda los 4 stems y el MIDI
       en `Musica/MidiForge/Export_fecha_hora`
 - [x] **Marca de seccion B** (v1.6) en el piano roll
-- [ ] Editor de arreglo A/B a la vista (marcar compases y secciones)
+- [x] **Editor de arreglo A/B a la vista** (v1.7): pestana ARREGLO con la tira de
+       compases; clic/arrastre fija donde empieza la B, AUTO y TODO A
 - [ ] Undo visible y multi-nivel por track (ademas de Ctrl+Z)
 
 ## Requisitos (para compilar)

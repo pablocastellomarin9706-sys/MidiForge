@@ -40,6 +40,9 @@ public:
   SessionIdea& getCurrentIdea() { return currentIdea; }
   void generateFull();
   void regenerateTrack(const juce::String& name);
+  // Move the A/B boundary (0-based index of the first B bar, -1 = auto).
+  // Replays the generators with the same picks, then applies "Variacion".
+  void setArrangementSplit(int splitBar);
   SampleLibrary& getSampleLibrary() { return sampleLibrary; }
 
   // Host transport tempo (read from the playhead in processBlock; cached).

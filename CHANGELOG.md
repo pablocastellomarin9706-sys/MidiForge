@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.7.0 - 2026-11-06
+
+### Added
+- **Editor de arreglo A/B (pestana ARREGLO)**: la idea se dibuja como una tira de
+  compases; clic o arrastre sobre un compas fija ahi el inicio de la seccion B.
+  Botones **AUTO** (mitad para 8+ compases, como antes) y **TODO A** (sin B).
+- El limite es de verdad: progresion, groove de bateria y motivo de melodia
+  cambian en la barra marcada, no siempre a la mitad. B puede empezar en el
+  compas 2 de una idea de 4 si te apetece un drop pronto.
+- **Regeneracion en caliente**: al mover el limite se rehacen las notas con los
+  mismos picks y la misma semilla; solo se mueve la frontera. BLOQ sigue
+  protegiendo cada track y el host marca el cambio como undo.
+- La marca B del piano roll, las pestanas ambar del grid y el detalle del
+  ChordStrip siguen ahora el limite elegido. Estado v6: el limite viaja con el
+  proyecto (los proyectos viejos siguen con mitad automatica).
+
 ## 1.6.0 - 2026-11-01
 
 ### Added

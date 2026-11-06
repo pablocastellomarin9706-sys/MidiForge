@@ -127,11 +127,11 @@ void DrumGenerator::generate(SessionIdea& idea, RandomGen& rng) {
 
   int bars = idea.bars > 0 ? idea.bars : 4;
 
-  // 8+ bar ideas get a second groove for the B half, so a long loop is not the
-  // same four bars pasted over and over.
+  // Section B (from the arrangement editor or the auto half) gets a second
+  // groove, so a long idea is not the same four bars pasted over and over.
   int secondIdx = -1;
-  const int secondStart = bars / 2;
-  if (bars >= 8) {
+  const int secondStart = idea.bStart();
+  if (idea.hasSectionB()) {
     auto cands = Content::drumIndicesFor(idea.style, idea.character);
     if (cands.size() > 1) {
       const int start = rng.nextInt(0, (int)cands.size() - 1);

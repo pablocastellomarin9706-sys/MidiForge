@@ -53,9 +53,11 @@ TrackIdea* TrackPage::trackMutable() {
 
 void TrackPage::refresh() {
   TrackIdea* t = trackMutable();
+  auto& idea = processor.getCurrentIdea();
+  const int bStart = idea.hasSectionB() ? idea.bStart() : -1;
   chordStrip.setTrack(t);
-  pianoRoll.setTrack(t, processor.getCurrentIdea().bars, kind == 1);
-  drumGrid.setTrack(t, processor.getCurrentIdea().bars, kind == 2);
+  pianoRoll.setTrack(t, idea.bars, kind == 1, bStart);
+  drumGrid.setTrack(t, idea.bars, kind == 2, bStart);
   lockButton.setToggleState(t != nullptr && t->locked, juce::dontSendNotification);
   detailText = (t != nullptr && t->detail.isNotEmpty()) ? t->detail : juce::String();
   if (t != nullptr && t->locked)
@@ -110,6 +112,14 @@ TabView::TabView(MidiForgeAudioProcessor& p) : tabs(juce::TabbedButtonBar::TabsA
   makePage("Bass", 1);
   makePage("Drums", 2);
 
+  arrangementPage = std::make_unique<ArrangementPanel>(p);
+  arrangementPage->onApplied = [this] {
+    // The boundary moved: repaint the roll/grid/chord marks of every track.
+    for (auto& pg : pages) pg->refresh();
+  };
+  tabs.addTab("ARREGLO", Palette::panel, arrangementPage.get(), false);
+  arrangementPage->refresh();
+
   samplePage = std::make_unique<SampleBrowser>(p);
   tabs.addTab("SAMPLES", Palette::panel, samplePage.get(), false);
 
@@ -119,6 +129,7 @@ TabView::TabView(MidiForgeAudioProcessor& p) : tabs(juce::TabbedButtonBar::TabsA
 
 void TabView::refreshAll() {
   for(auto& p : pages) p->refresh();
+  if (arrangementPage) arrangementPage->refresh();
   if (soundPage) soundPage->refresh();
 }
 

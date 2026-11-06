@@ -48,10 +48,11 @@ juce::Rectangle<float> DrumGrid::gridArea() const {
   return r;
 }
 
-void DrumGrid::setTrack(TrackIdea* t, int barCount, bool canEdit) {
+void DrumGrid::setTrack(TrackIdea* t, int barCount, bool canEdit, int bStartBar) {
   if (t != track) undoStack.clear();
   track = t;
   bars = juce::jmax(1, barCount);
+  bStart = bStartBar;
   editable = canEdit;
   currentBar = juce::jlimit(0, bars - 1, currentBar);
   setWantsKeyboardFocus(editable);
@@ -85,7 +86,7 @@ void DrumGrid::paint(juce::Graphics& g) {
     for (int b = 0; b < bars; ++b) {
       auto tr = juce::Rectangle<float>(x, tabs.getY(), 24.0f, tabs.getHeight());
       const bool sel = (b == currentBar);
-      const bool bSection = (bars >= 8 && b >= bars / 2);
+      const bool bSection = (bStart > 0 && bStart < bars && b >= bStart);
       g.setColour(sel ? Palette::accent.withAlpha(0.90f)
                       : (bSection ? Palette::accentDim.withAlpha(0.55f) : Palette::panelAlt));
       g.fillRoundedRectangle(tr, 4.0f);

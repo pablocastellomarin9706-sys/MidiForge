@@ -79,7 +79,7 @@ void MidiForgeAudioProcessor::changeProgramName(int, const juce::String&) {}
 
 void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   juce::XmlElement xml("MidiForgeState");
-  xml.setAttribute("version", 5);
+  xml.setAttribute("version", 6);
   xml.setAttribute("folders", sampleLibrary.getFolders().joinIntoString("\n"));
   xml.setAttribute("favorites", sampleLibrary.getFavorites().joinIntoString("\n"));
   xml.setAttribute("freesoundKey", freesoundKey);
@@ -105,6 +105,7 @@ void MidiForgeAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   xml.setAttribute("drumIdx", idea.drumPatternIdx);
   xml.setAttribute("bassIdx", idea.bassPatternIdx);
   xml.setAttribute("motifIdx", idea.melodyMotifIdx);
+  xml.setAttribute("split", idea.splitBar);
 
   // Manual piano-roll edits are the only non-deterministic part of an idea, so
   // they are stored note by note (only for the tracks the user touched).
@@ -172,6 +173,8 @@ void MidiForgeAudioProcessor::setStateInformation(const void* data, int sizeInBy
   idea.drumPatternIdx = xml->getIntAttribute("drumIdx", -1);
   idea.bassPatternIdx = xml->getIntAttribute("bassIdx", -1);
   idea.melodyMotifIdx = xml->getIntAttribute("motifIdx", -1);
+  // A/B boundary (v6). Older states have no attribute -> auto half.
+  idea.splitBar = juce::jlimit(-1, 32, xml->getIntAttribute("split", -1));
 
   // Rebuild the exact same idea. If a catalog has changed since the save and
   // a curated pick no longer exists, generateFromSaved falls back to pickAll.
@@ -231,6 +234,13 @@ void MidiForgeAudioProcessor::generateFull() {
   IdeaGenerator::applyCreativity(currentIdea, currentIdea.creativity, 0);
   autoSoundRoll = 0;
   pickAutoSoundsForIdea();
+}
+
+void MidiForgeAudioProcessor::setArrangementSplit(int splitBar) {
+  currentIdea.splitBar = juce::jlimit(-1, currentIdea.totalBars(), splitBar);
+  IdeaGenerator gen;
+  gen.regenerateArrangement(currentIdea);
+  IdeaGenerator::applyCreativity(currentIdea, currentIdea.creativity, 0);
 }
 
 void MidiForgeAudioProcessor::regenerateTrack(const juce::String& name) {

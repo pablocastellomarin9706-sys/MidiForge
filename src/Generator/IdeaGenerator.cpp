@@ -158,10 +158,10 @@ void IdeaGenerator::pickAll(SessionIdea& idea, RandomGen& rng) {
   idea.progressionDisplay = P.display;
   idea.progressionName = P.name;
 
-  // B section (8+ bars): a second progression from the same family. Picked
+  // Section B: a second progression from the same family. Picked
   // deterministically (the next candidate) so it never shifts the other picks.
   idea.progressionIdxB = -1;
-  if (idea.bars >= 8 && progs.size() > 1) {
+  if (idea.hasSectionB() && progs.size() > 1) {
     size_t pos = 0;
     for (size_t i = 0; i < progs.size(); ++i)
       if (progs[i] == idea.progressionIdx) { pos = i; break; }
@@ -249,6 +249,47 @@ void IdeaGenerator::generateFromSaved(SessionIdea& idea) {
   applyCharacterPost(idea, rng);
 }
 
+void IdeaGenerator::regenerateArrangement(SessionIdea& idea) {
+  // If a curated pick went stale (catalog changed), fall back to a fresh pick
+  // so the replay below has valid indices to work with.
+  bool idsOk = idea.progressionIdx >= 0 && idea.progressionIdx < (int)Content::allProgressions().size() &&
+               idea.drumPatternIdx >= 0 && idea.drumPatternIdx < (int)Content::allDrumPatterns().size() &&
+               idea.bassPatternIdx >= 0 && idea.bassPatternIdx < (int)Content::allBassPatterns().size();
+  if (!idsOk) {
+    RandomGen pickRng((int)((baseSeedOf(idea) ^ 0x2f6a1b3) % 2147483647));
+    pickAll(idea, pickRng);
+  }
+
+  // Keep the B progression consistent with the new boundary: it must exist,
+  // point into the style family and differ from A's.
+  if (idea.hasSectionB()) {
+    ScaleType fam = MusicTheory::isMinorFamily(idea.scale) ? ScaleType::MinorNatural : ScaleType::Major;
+    auto progs = Content::progressionIndicesFor(idea.style, fam, idea.character);
+    const bool stale = idea.progressionIdxB < 0 ||
+                       idea.progressionIdxB >= (int)Content::allProgressions().size();
+    if (progs.size() > 1 && (stale || idea.progressionIdxB == idea.progressionIdx)) {
+      size_t pos = 0;
+      for (size_t i = 0; i < progs.size(); ++i)
+        if (progs[i] == idea.progressionIdx) { pos = i; break; }
+      idea.progressionIdxB = progs[(pos + 1) % progs.size()];
+    } else if (progs.size() <= 1) {
+      idea.progressionIdxB = -1;
+    }
+  } else {
+    idea.progressionIdxB = -1;
+  }
+
+  // Replay the exact same generators/rng stream (like generateFromSaved), so
+  // only the A/B boundary moves; locked tracks keep their notes and flags.
+  auto oldTracks = idea.tracks;
+  RandomGen rng((int)(baseSeedOf(idea) % 2147483647));
+  idea.tracks.clear();
+  runAll(idea, rng);
+  applyCharacterPost(idea, rng);
+  restoreLocked(idea.tracks, oldTracks);
+  restoreFlags(idea.tracks, oldTracks);
+}
+
 void IdeaGenerator::clearTrack(SessionIdea& idea, const juce::String& name) {
   for (auto it = idea.tracks.begin(); it != idea.tracks.end(); ) {
     if (it->name == name) it = idea.tracks.erase(it);
@@ -272,7 +313,7 @@ void IdeaGenerator::regenerateTrack(SessionIdea& idea, const juce::String& track
     const auto& P = Content::allProgressions()[(size_t)idea.progressionIdx];
     idea.progressionDisplay = P.display;
     idea.progressionName = P.name;
-    if (idea.bars >= 8 && progs.size() > 1)
+    if (idea.hasSectionB() && progs.size() > 1)
       idea.progressionIdxB = pickDifferent(progs, idea.progressionIdx, rng);
     else
       idea.progressionIdxB = -1;

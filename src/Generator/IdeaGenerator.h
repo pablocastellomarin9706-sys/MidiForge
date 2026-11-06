@@ -11,6 +11,9 @@ public:
   void regenerateTrack(SessionIdea& idea, const juce::String& trackName, int seedOffset=0);
   // Rebuilds a restored (persisted) idea from its seed/take/curated picks.
   void generateFromSaved(SessionIdea& idea);
+  // Replays the idea after the A/B boundary moved: same curated picks and rng
+  // stream, only the section split changes. Locked tracks stay untouched.
+  void regenerateArrangement(SessionIdea& idea);
 
   // "Variacion" knob: deterministic extra humanisation layered on top of a
   // finished idea (velocity variance, micro-timing, octave sparkle).

@@ -150,7 +150,7 @@ std::vector<RealizedChord> realizeProgression(const SessionIdea& idea) {
   const auto& progs = allProgressions();
   if (idea.progressionIdx < 0 || idea.progressionIdx >= (int)progs.size()) return out;
   const auto& prog = progs[(size_t)idea.progressionIdx];
-  const auto& progB = (idea.bars >= 8 && idea.progressionIdxB >= 0 &&
+  const auto& progB = (idea.hasSectionB() && idea.progressionIdxB >= 0 &&
                        idea.progressionIdxB < (int)progs.size())
                           ? progs[(size_t)idea.progressionIdxB]
                           : prog;
@@ -175,11 +175,12 @@ std::vector<RealizedChord> realizeProgression(const SessionIdea& idea) {
   };
 
   int bars = idea.bars > 0 ? idea.bars : 4;
+  const int bStart = idea.bStart();
   std::vector<int> prev;
   for (int bar = 0; bar < bars; ++bar) {
-    // 8+ bar ideas: the B half gets its own progression, so the arrangement
-    // moves instead of repeating the same four bars.
-    const bool useB = (bars >= 8 && bar >= bars / 2);
+    // Section B (arrangement editor or auto half): its own progression, so a
+    // long idea moves instead of repeating the same four bars.
+    const bool useB = (idea.hasSectionB() && bar >= bStart);
     const auto& active = useB ? progB : prog;
     const auto& s = active.chords[(size_t)bar % active.chords.size()];
     int semi = MusicTheory::degreeToSemitone(strict ? chordScale : active.scale, s.degree) +
